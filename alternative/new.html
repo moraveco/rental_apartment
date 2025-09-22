@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="cs" class="no-js">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Premium Apartments – Luxusní pronájem</title>
+  <meta name="description" content="Luxusní pronájem prémiových apartmánů. Imersivní 3D prohlídka, okamžitá rezervace a moderní zážitek jako na Apple.com." />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #0b0f14;
+      --bg-soft: #0f141b;
+      --text: #e9ecf1;
+      --muted: #aeb6c1;
+      --glass: rgba(255,255,255,0.08);
+      --glass-strong: rgba(255,255,255,0.14);
+      --stroke: rgba(255,255,255,0.12);
+      --gold: #d7b77a;
+      --ivory: #f5f2ea;
+      --navy: #0a1220;
+      --green: #1d3a33;
+      --shadow: rgba(0,0,0,0.35);
+      --blur: 16px;
+      --radius: 16px;
+      --radius-lg: 22px;
+      --maxw: 1200px;
+      --pad: clamp(16px, 2vw, 24px);
+    }
+    [data-theme="light"] {
+      --bg: #f7f7f5;
+      --bg-soft: #ffffff;
+      --text: #121417;
+      --muted: #5a6673;
+      --glass: rgba(0,0,0,0.06);
+      --glass-strong: rgba(0,0,0,0.1);
+      --stroke: rgba(0,0,0,0.08);
+      --shadow: rgba(0,0,0,0.12);
+    }
+    * { box-sizing: border-box; }
+    html, body { height: 100%; }
+    body {
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
+      color: var(--text);
+      background: radial-gradient(1200px 800px at 80% -10%, #132030 0%, var(--bg) 60%) fixed;
+      overflow-x: hidden;
+    }
+    .container { width: min(100%, var(--maxw)); margin-inline: auto; padding-inline: var(--pad); }
+    header.nav {
+      position: fixed; inset-inline: 0; top: 0; z-index: 50;
+      display: flex; justify-content: center; pointer-events: none;
+    }
+    .nav__inner {
+      pointer-events: auto;
+      width: min(100%, var(--maxw));
+      margin: var(--pad); padding: 12px 16px;
+      display: flex; align-items: center; gap: 16px; justify-content: space-between;
+      background: var(--glass); backdrop-filter: blur(var(--blur));
+      border: 1px solid var(--stroke); border-radius: 14px;
+      box-shadow: 0 10px 30px var(--shadow);
+    }
+    .brand { display: flex; align-items: center; gap: 12px; font-weight: 600; letter-spacing: 0.08em; }
+    .brand__dot {
+      width: 14px; height: 14px; border-radius: 50%;
+      background: linear-gradient(180deg, var(--gold), #b79a63);
+      box-shadow: 0 0 16px rgba(215,183,122,0.7);
+    }
+    .nav__links { display: flex; gap: 18px; align-items: center; }
+    .nav__links a { color: var(--text); text-decoration: none; opacity: 0.9; font-size: 14px; }
+    .theme-toggle {
+      appearance: none; border: 1px solid var(--stroke); background: var(--glass);
+      color: var(--text); padding: 8px 12px; border-radius: 12px; cursor: pointer;
+    }
+
+    /* HERO */
+    .hero {
+      position: relative; height: 100svh; min-height: 560px; isolation: isolate;
+    }
+    canvas#hero-canvas {
+      position: absolute; inset: 0; width: 100%; height: 100%; display: block;
+    }
+    .hero__overlay {
+      position: relative; z-index: 2; height: 100%; display: grid; place-items: center;
+      text-align: center; padding-top: 72px;
+    }
+    .headline {
+      font-family: "Playfair Display", serif; font-weight: 600;
+      font-size: clamp(32px, 6.2vw, 80px); line-height: 1.05;
+      letter-spacing: -0.02em;
+    }
+    .headline .word { display: inline-block; opacity: 0; transform: translateY(18px); }
+    .subline {
+      margin-top: 14px; color: var(--muted); font-size: clamp(14px, 2.2vw, 18px);
+    }
+    .cta-row { margin-top: 28px; display: flex; gap: 12px; justify-content: center; }
+    .btn {
+      position: relative; overflow: hidden; cursor: pointer; user-select: none;
+      border: 1px solid var(--stroke); background: var(--glass-strong);
+      color: var(--text); padding: 14px 20px; border-radius: 14px; font-weight: 600;
+      transition: transform .25s cubic-bezier(.2,.8,.2,1);
+      box-shadow: 0 8px 24px var(--shadow);
+    }
+    .btn--primary { background: linear-gradient(180deg, var(--gold), #b79a63); color: #111; border: none; }
+    .btn:active { transform: scale(0.98); }
+    .btn__magnet {
+      position: absolute; inset: 0; pointer-events: none; mix-blend-mode: soft-light;
+      background: radial-gradient(120px 120px at var(--mx,50%) var(--my,50%), rgba(255,255,255,.35), transparent 60%);
+      opacity: 0; transition: opacity .2s;
+    }
+    .btn:hover .btn__magnet { opacity: 1; }
+
+    /* BOOKING PANEL (floating) */
+    .booking {
+      position: fixed; right: var(--pad); bottom: var(--pad); z-index: 40;
+      backdrop-filter: blur(calc(var(--blur) * .75)); background: var(--glass);
+      border: 1px solid var(--stroke); border-radius: var(--radius-lg);
+      box-shadow: 0 18px 48px var(--shadow);
+      padding: 14px; display: grid; grid-template-columns: 1fr auto; gap: 12px; align-items: center;
+      transform: translateY(120%); opacity: 0;
+    }
+    .booking__row { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; }
+    .field {
+      display: grid; gap: 6px; background: var(--glass); border: 1px solid var(--stroke);
+      padding: 10px 12px; border-radius: 12px;
+    }
+    .field label { font-size: 12px; color: var(--muted); }
+    .field input { background: transparent; border: none; color: var(--text); outline: none; font-size: 14px; }
+    .price { font-weight: 700; font-size: 18px; letter-spacing: .02em; }
+    .price i { font-weight: 400; font-size: 12px; color: var(--muted); }
+    @media (max-width: 680px){
+      .booking { left: var(--pad); right: var(--pad); grid-template-columns: 1fr; }
+      .nav__links { display: none; }
+    }
+
+    /* FLOORPLAN / INTERIOR 3D */
+    section.scene { position: relative; padding: 90px 0; }
+    .scene__wrap {
+      position: relative; border-radius: var(--radius-lg);
+      background: linear-gradient(180deg, var(--bg-soft), transparent);
+      border: 1px solid var(--stroke);
+      overflow: clip;
+    }
+    canvas#scene-canvas { width: 100%; height: min(72vh, 720px); display: block; }
+    .scene__ui {
+      position: absolute; top: 16px; left: 16px; display: flex; gap: 8px; z-index: 2;
+      background: var(--glass); border: 1px solid var(--stroke); backdrop-filter: blur(var(--blur));
+      padding: 10px; border-radius: 12px;
+    }
+    .chip { font-size: 13px; padding: 8px 12px; border-radius: 999px; cursor: pointer;
+      background: var(--glass); border: 1px solid var(--stroke); }
+    .chip.active { background: linear-gradient(180deg, var(--gold), #b79a63); color: #111; border: none; }
+
+    /* GALLERY */
+    section.gallery { padding: 100px 0 40px; }
+    .h-scroll {
+      display: grid; grid-auto-flow: column; grid-auto-columns: 80%;
+      gap: 24px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 12px;
+    }
+    .h-scroll::-webkit-scrollbar { height: 8px; }
+    .h-scroll::-webkit-scrollbar-thumb { background: var(--glass-strong); border-radius: 8px; }
+    .photo {
+      position: relative; aspect-ratio: 16/9; border-radius: 18px; overflow: hidden;
+      scroll-snap-align: center; border: 1px solid var(--stroke);
+      box-shadow: 0 12px 40px var(--shadow);
+    }
+    .photo img { width: 100%; height: 100%; object-fit: cover; transform: scale(1.12); transition: transform 10s ease; }
+    .photo:hover img { transform: scale(1.18); }
+    .photo::after {
+      content: ""; position: absolute; inset: 0; pointer-events: none;
+      background: radial-gradient(80% 120% at 80% 20%, transparent, rgba(0,0,0,.25));
+    }
+
+    /* FEATURES */
+    section.features { padding: 90px 0; }
+    .features__grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px;
+    }
+    .feature {
+      position: relative; padding: 20px; border-radius: 16px; border: 1px solid var(--stroke);
+      background: linear-gradient(180deg, var(--glass), transparent);
+      overflow: hidden; transform-style: preserve-3d;
+    }
+    .feature__icon {
+      width: 54px; height: 54px; border-radius: 14px; display: grid; place-items: center;
+      background: linear-gradient(180deg, var(--gold), #b79a63); color: #111; font-weight: 800;
+      box-shadow: 0 10px 24px rgba(215,183,122,.45);
+      transform: translateZ(40px) translateY(8px);
+    }
+    .feature h3 { font-family: "Playfair Display", serif; margin: 16px 0 6px; }
+    .feature p { color: var(--muted); }
+    @media (max-width: 960px){
+      .features__grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px){
+      .features__grid { grid-template-columns: 1fr; }
+    }
+
+    /* REVIEWS */
+    section.reviews { padding: 80px 0; }
+    .reviews__grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; }
+    .review {
+      perspective: 800px;
+    }
+    .card {
+      transform-style: preserve-3d; transition: transform .25s ease, box-shadow .25s ease;
+      background: var(--glass); border: 1px solid var(--stroke); border-radius: 16px; padding: 18px;
+      box-shadow: 0 10px 26px var(--shadow);
+    }
+    .stars { color: #ffd166; letter-spacing: 2px; margin-bottom: 8px; }
+    @media (max-width: 960px){
+      .reviews__grid { grid-template-columns: 1fr 1fr; }
+    }
+    @media (max-width: 640px){
+      .reviews__grid { grid-template-columns: 1fr; }
+    }
+
+    /* CONTACT MODAL */
+    .modal {
+      position: fixed; inset: 0; display: none; place-items: center; z-index: 60;
+      background: rgba(0,0,0,.35); backdrop-filter: blur(8px);
+    }
+    .modal.open { display: grid; }
+    .modal__panel {
+      position: relative; width: min(96vw, 560px);
+      background: var(--bg-soft); border: 1px solid var(--stroke);
+      border-radius: 18px; overflow: hidden; box-shadow: 0 24px 60px var(--shadow);
+    }
+    .modal__canvas { position: absolute; inset: 0; opacity: .28; }
+    .modal__content { position: relative; padding: 22px; display: grid; gap: 12px; }
+    .modal__title { font-family: "Playfair Display", serif; font-size: 28px; }
+    .form-row { display: grid; gap: 6px; }
+    .form-row input, .form-row textarea {
+      padding: 12px 14px; border-radius: 12px; border: 1px solid var(--stroke); background: var(--glass);
+      color: var(--text); outline: none;
+    }
+    .form-actions { display: flex; justify-content: space-between; align-items: center; margin-top: 6px; }
+    .close-x {
+      position: absolute; top: 8px; right: 8px; border: none; background: var(--glass); color: var(--text);
+      padding: 8px 10px; border-radius: 10px; cursor: pointer; border: 1px solid var(--stroke);
+    }
+
+    /* FOOTER + MAP */
+    footer { padding: 40px 0 90px; }
+    .map {
+      height: 300px; border-radius: 16px; overflow: hidden; border: 1px solid var(--stroke);
+      filter: saturate(0.8) contrast(1.05) brightness(0.95);
+    }
+    .socials { display: flex; gap: 10px; margin-top: 14px; }
+    .social {
+      width: 42px; height: 42px; display: grid; place-items: center; border-radius: 12px;
+      background: var(--glass); border: 1px solid var(--stroke); cursor: pointer;
+      transition: transform .25s cubic-bezier(.2,.8,.2,1);
+    }
+    .social:active { transform: translateY(2px) scale(0.98); }
+
+    /* Section titles */
+    .section-title {
+      font-family: "Playfair Display", serif; font-size: clamp(24px, 3.2vw, 38px);
+      margin: 0 0 18px;
+    }
+    .muted { color: var(--muted); }
+  </style>
+</head>
+<body data-theme="dark">
+  <header class="nav">
+    <div class="nav__inner">
+      <div class="brand">
+        <span class="brand__dot"></span>
+        <span>Premium Apartments</span>
+      </div>
+      <nav class="nav__links">
+        <a href="#scene">3D Prohlídka</a>
+        <a href="#gallery">Galerie</a>
+        <a href="#features">Vybavení</a>
+        <a href="#reviews">Recenze</a>
+        <a href="#contact" id="contact-open">Kontakt</a>
+      </nav>
+      <button class="theme-toggle" id="themeToggle" aria-label="Přepnout režim">⟷ Režim</button>
+    </div>
+  </header>
+
+  <main>
+    <!-- HERO -->
+    <section class="hero" aria-label="Hlavní prezentace">
+      <canvas id="hero-canvas"></canvas>
+      <div class="hero__overlay container">
+        <div>
+          <h1 class="headline" id="headline">
+            <span class="word">Luxusní</span> <span class="word">Apartmány</span>
+            <span class="word">s</span> <span class="word">Výhledem,</span>
+            <span class="word">který</span> <span class="word">vezme</span>
+            <span class="word">dech.</span>
+          </h1>
+          <p class="subline">Imersivní 3D zážitek. Okamžitá rezervace. Minimalistický design.</p>
+          <div class="cta-row">
+            <button class="btn btn--primary" id="bookNow">
+              Rezervovat nyní
+              <span class="btn__magnet"></span>
+            </button>
+            <button class="btn" onclick="document.getElementById('scene').scrollIntoView({behavior:'smooth'})">
+              Prozkoumat 3D
+              <span class="btn__magnet"></span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- FLOATING BOOKING -->
+    <aside class="booking" id="bookingPanel" aria-live="polite">
+      <div class="booking__row">
+        <div class="field">
+          <label for="dateFrom">Příjezd</label>
+          <input type="date" id="dateFrom" />
+        </div>
+        <div class="field">
+          <label for="dateTo">Odjezd</label>
+          <input type="date" id="dateTo" />
+        </div>
+        <div class="field">
+          <label for="guests">Hosté</label>
+          <input type="number" id="guests" min="1" value="2" />
+        </div>
+      </div>
+      <div class="booking__row" style="justify-content: end;">
+        <div class="price" id="price"><span>6 900 Kč</span> <i>/ noc</i></div>
+        <button class="btn btn--primary" id="bookFloating">
+          Book Now
+          <span class="btn__magnet"></span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- 3D FLOORPLAN / INTERIOR SCENE -->
+    <section class="scene container" id="scene" aria-label="3D prohlídka">
+      <h2 class="section-title">3D Prohlídka</h2>
+      <p class="muted">Rotujte scénu tažením. Přibližujte kolečkem. Funkční hotspoty se zvýrazní při přejetí.</p>
+      <div class="scene__wrap">
+        <div class="scene__ui">
+          <button class="chip active" data-mode="floorplan">Půdorys</button>
+          <button class="chip" data-mode="interior">Interiér</button>
+          <button class="chip" data-mode="details">Detaily</button>
+        </div>
+        <canvas id="scene-canvas"></canvas>
+      </div>
+    </section>
+
+    <!-- GALLERY -->
+    <section class="gallery container" id="gallery" aria-label="Galerie">
+      <h2 class="section-title">Galerie</h2>
+      <div class="h-scroll">
+        <figure class="photo">
+          <img src="https://images.unsplash.com/photo-1501183638710-841dd1904471?q=80&w=1600&auto=format&fit=crop" alt="Obývací pokoj – panorama" />
+        </figure>
+        <figure class="photo">
+          <img src="https://images.unsplash.com/photo-1560066984-138dadb4c035?q=80&w=1600&auto=format&fit=crop" alt="Ložnice – měkké světlo" />
+        </figure>
+        <figure class="photo">
+          <img src="https://images.unsplash.com/photo-1560448075-bb4caa6c1b2e?q=80&w=1600&auto=format&fit=crop" alt="Kuchyně – mramor & zlato" />
+        </figure>
+        <figure class="photo">
+          <img src="https://images.unsplash.com/photo-1505693416388-ac5ce068fe85?q=80&w=1600&auto=format&fit=crop" alt="Terasa – výhled do krajiny" />
+        </figure>
+      </div>
+    </section>
+
+    <!-- FEATURES -->
+    <section class="features container" id="features" aria-label="Vybavení">
+      <h2 class="section-title">Privátní komfort & výjimečné detaily</h2>
+      <div class="features__grid">
+        <article class="feature">
+          <div class="feature__icon">⛰️</div>
+          <h3>Panoramatické výhledy</h3>
+          <p class="muted">Okna od podlahy ke stropu s nerušeným horizontem.</p>
+        </article>
+        <article class="feature">
+          <div class="feature__icon">🧖</div>
+          <h3>Soukromé wellness</h3>
+          <p class="muted">Sauna s aromaterapií a déšťovou sprchou.</p>
+        </article>
+        <article class="feature">
+          <div class="feature__icon">🍷</div>
+          <h3>Vinný kabinet</h3>
+          <p class="muted">Klimatizace, someliérský výběr a křišťálové sklo.</p>
+        </article>
+        <article class="feature">
+          <div class="feature__icon">🔒</div>
+          <h3>Chytrý vstup</h3>
+          <p class="muted">Bezklíčový přístup a zabezpečení na úrovni hotelu.</p>
+        </article>
+        <article class="feature">
+          <div class="feature__icon">🔥</div>
+          <h3>Krbiště</h3>
+          <p class="muted">Atmosférické večery s bio krbem.</p>
+        </article>
+        <article class="feature">
+          <div class="feature__icon">🌿</div>
+          <h3>Privátní terasa</h3>
+          <p class="muted">Zahradní zeleň s ambientním osvětlením.</p>
+        </article>
+      </div>
+    </section>
+
+    <!-- REVIEWS -->
+    <section class="reviews container" id="reviews" aria-label="Recenze">
+      <h2 class="section-title">Recenze hostů</h2>
+      <div class="reviews__grid">
+        <div class="review">
+          <div class="card">
+            <div class="stars">★★★★★</div>
+            <p>„Nezapomenutelný pobyt – interiér, ticho, výhled. Vrátíme se.“</p>
+            <p class="muted">— Anna, Praha</p>
+          </div>
+        </div>
+        <div class="review">
+          <div class="card">
+            <div class="stars">★★★★★</div>
+            <p>„Design a detaily na hotelové úrovni. Velmi doporučuji.“</p>
+            <p class="muted">— Marek, Brno</p>
+          </div>
+        </div>
+        <div class="review">
+          <div class="card">
+            <div class="stars">★★★★★</div>
+            <p>„Wellness v apartmánu je boží. Překvapení k výročí nás dojalo.“</p>
+            <p class="muted">— Petra, Ostrava</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- CONTACT (modal trigger anchor) -->
+    <section class="container" id="contact" style="padding: 10px 0 60px;">
+      <div class="cta-row" style="justify-content:center;">
+        <button class="btn" id="contactOpen2">
+          Napsat zprávu
+          <span class="btn__magnet"></span>
+        </button>
+      </div>
+    </section>
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="container" aria-label="Zápatí">
+    <div class="map">
+      <iframe
+        title="Mapa"
+        width="100%" height="100%" style="border:0"
+        loading="lazy" allowfullscreen
+        referrerpolicy="no-referrer-when-downgrade"
+        src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d2564.635!2d14.42076!3d50.08804!2m3!1f70!2f45!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zUHJlbWl1bSBBcGFydG1lbnRz!5e0!3m2!1scs!2scz!4v0000000000">
+      </iframe>
+    </div>
+    <div class="socials">
+      <div class="social" data-pop>IG</div>
+      <div class="social" data-pop>FB</div>
+      <div class="social" data-pop>YT</div>
+    </div>
+  </footer>
+
+  <!-- CONTACT MODAL -->
+  <div class="modal" id="contactModal" aria-modal="true" role="dialog" aria-label="Kontaktní formulář">
+    <div class="modal__panel">
+      <canvas class="modal__canvas" id="modal-canvas"></canvas>
+      <button class="close-x" id="contactClose" aria-label="Zavřít">✕</button>
+      <div class="modal__content">
+        <div class="modal__title">Kontaktujte nás</div>
+        <div class="form-row">
+          <label for="name">Jméno</label>
+          <input id="name" placeholder="Vaše jméno" />
+        </div>
+        <div class="form-row">
+          <label for="email">E‑mail</label>
+          <input id="email" type="email" placeholder="vas@email.cz" />
+        </div>
+        <div class="form-row">
+          <label for="message">Zpráva</label>
+          <textarea id="message" rows="4" placeholder="Řekněte nám, co potřebujete…"></textarea>
+        </div>
+        <div class="form-actions">
+          <span class="muted">Odpovíme do 24 hodin.</span>
+          <button class="btn btn--primary" id="sendMsg">
+            Odeslat
+            <span class="btn__magnet"></span>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Three.js + GSAP -->
+  <script src="https://unpkg.com/three@0.161.0/build/three.min.js"></script>
+  <script src="https://unpkg.com/three@0.161.0/examples/js/postprocessing/EffectComposer.js"></script>
+  <script src="https://unpkg.com/three@0.161.0/examples/js/postprocessing/RenderPass.js"></script>
+  <script src="https://unpkg.com/three@0.161.0/examples/js/postprocessing/UnrealBloomPass.js"></script>
+  <script src="https://unpkg.com/three@0.161.0/examples/js/controls/OrbitControls.js"></script>
+  <script src="https://unpkg.com/gsap@3.12.5/dist/gsap.min.js"></script>
+  <script src="https://unpkg.com/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+
+  <script>
+    // Utils
+    const clamp = (n, min, max) => Math.max(min, Math.min(max, n));
+    const lerp = (a, b, t) => a + (b - a) * t;
+
+    // THEME
+    const themeToggle = document.getElementById('themeToggle');
+    themeToggle.addEventListener('click', () => {
+      const root = document.body;
+      const next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      root.setAttribute('data-theme', next);
+    });
+
+    // MAGNET buttons
+    document.querySelectorAll('.btn').forEach(btn => {
+      btn.addEventListener('pointermove', (e) => {
+        const r = btn.getBoundingClientRect();
+        const x = e.clientX - r.left, y = e.clientY - r.top;
+        btn.style.setProperty('--mx', x + 'px');
+        btn.style.setProperty('--my', y + 'px');
+        const dx = (x / r.width - .5) * 8;
+        const dy = (y / r.height - .5) * 8;
+        btn.style.transform = `translate(${dx}px, ${dy}px)`;
+      });
+      btn.addEventListener('pointerleave', () => { btn.style.transform = 'translate(0,0)'; });
+    });
+
+    // GSAP intro typography
+    gsap.registerPlugin(ScrollTrigger);
+    gsap.to('.headline .word', {
+      opacity: 1, y: 0, duration: .8, stagger: .08, ease: 'power3.out', delay: .2
+    });
+    // Show booking panel after hero
+    gsap.to('#bookingPanel', {
+      scrollTrigger: { trigger: '.hero', start: 'bottom bottom', toggleActions: 'play none none reverse' },
+      y: 0, opacity: 1, duration: .6, ease: 'power2.out'
+    });
+
+    // PRICE animation on inputs
+    const priceEl = document.getElementById('price').querySelector('span');
+    const dateFrom = document.getElementById('dateFrom');
+    const dateTo = document.getElementById('dateTo');
+    const guests = document.getElementById('guests');
+    function updatePrice() {
+      const base = 6900;
+      const g = clamp(parseInt(guests.value || '1', 10), 1, 6);
+      const dynamic = base + (g - 2) * 500;
+      gsap.to({ val: parseInt(priceEl.textContent.replace(/\D/g,''), 10) || base }, {
+        val: dynamic, duration: .5, ease: 'power2.out',
+        onUpdate: function() {
+          priceEl.textContent = Math.round(this.targets()[0].val).toLocaleString('cs-CZ') + ' Kč';
+        }
+      });
+    }
+    [dateFrom, dateTo, guests].forEach(el => el.addEventListener('change', updatePrice));
+
+    // Hero Three.js – cinematic key/cube with bloom and scroll/drag controls
+    ;(function initHero(){
+      const canvas = document.getElementById('hero-canvas');
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true, powerPreference: 'high-performance' });
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 100);
+      camera.position.set(0, 0.2, 4);
+
+      const resize = () => {
+        const w = canvas.clientWidth, h = canvas.clientHeight;
+        renderer.setPixelRatio(clamp(window.devicePixelRatio, 1, 2));
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h; camera.updateProjectionMatrix();
+        composer.setSize(w, h);
+      };
+
+      // Lighting
+      scene.add(new THREE.AmbientLight(0xffffff, 0.45));
+      const dir = new THREE.DirectionalLight(0xffffff, 1.0); dir.position.set(2,2,2); scene.add(dir);
+
+      // Object – luxe metal torus-knot (symbolický „klíč“)
+      const geo = new THREE.TorusKnotGeometry(0.75, 0.25, 240, 48, 2, 5);
+      const mat = new THREE.MeshPhysicalMaterial({
+        metalness: 1, roughness: 0.2, color: new THREE.Color('#c9b27a'),
+        envMapIntensity: 1.2, clearcoat: 1, clearcoatRoughness: .1
+      });
+      const mesh = new THREE.Mesh(geo, mat); scene.add(mesh);
+
+      // Floor plane subtle reflection
+      const plane = new THREE.Mesh(
+        new THREE.PlaneGeometry(20, 20),
+        new THREE.MeshStandardMaterial({ color: new THREE.Color('#0b0f14'), roughness: .9, metalness: .1 })
+      );
+      plane.rotation.x = -Math.PI/2; plane.position.y = -1.4; scene.add(plane);
+
+      // Postprocessing
+      const composer = new THREE.EffectComposer(renderer);
+      const renderPass = new THREE.RenderPass(scene, camera);
+      const bloom = new THREE.UnrealBloomPass(new THREE.Vector2(1024, 1024), 0.8, 0.9, 0.2);
+      composer.addPass(renderPass); composer.addPass(bloom);
+
+      // Parallax & drag
+      let targetRotX = 0, targetRotY = 0;
+      let isDown = false, sx = 0, sy = 0, rotX = 0, rotY = 0;
+      canvas.addEventListener('pointerdown', (e)=>{ isDown = true; sx = e.clientX; sy = e.clientY; canvas.setPointerCapture(e.pointerId); });
+      canvas.addEventListener('pointermove', (e)=>{
+        if(!isDown) return;
+        const dx = (e.clientX - sx) / 200;
+        const dy = (e.clientY - sy) / 200;
+        targetRotY += dx; targetRotX += dy;
+        sx = e.clientX; sy = e.clientY;
+      });
+      window.addEventListener('pointerup', ()=> isDown = false);
+
+      // Scroll-driven reveal (like Apple): rotate + dolly
+      let scrollT = 0;
+      ScrollTrigger.create({
+        trigger: '.hero', start: 'top top', end: 'bottom top', scrub: true,
+        onUpdate: self => { scrollT = self.progress; }
+      });
+
+      function animate(t){
+        const time = t * 0.001;
+        rotX = lerp(rotX, targetRotX, 0.08);
+        rotY = lerp(rotY, targetRotY, 0.08);
+        mesh.rotation.set(rotX + Math.sin(time*0.7)*0.05, rotY + time*0.2, 0);
+
+        // Camera cinematic movement tied to scroll
+        camera.position.z = 4 - scrollT * 1.2;
+        camera.position.y = 0.2 + scrollT * 0.2;
+        camera.lookAt(0, 0, 0);
+
+        // Soft float
+        mesh.position.y = Math.sin(time*1.2) * 0.06;
+
+        composer.render();
+        requestAnimationFrame(animate);
+      }
+      resize(); window.addEventListener('resize', resize);
+      requestAnimationFrame(animate);
+    })();
+
+    // Scene Three.js – simplified „floorplan“ vs „interior“ modes with hotspots
+    ;(function initScene(){
+      const canvas = document.getElementById('scene-canvas');
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(55, 1, 0.1, 200);
+      camera.position.set(2.6, 2.0, 3.2);
+      const controls = new THREE.OrbitControls(camera, canvas);
+      controls.enableDamping = true; controls.dampingFactor = .06; controls.maxPolarAngle = Math.PI/2.1; controls.minDistance = 1.2; controls.maxDistance = 8;
+
+      const resize = () => {
+        const w = canvas.clientWidth, h = canvas.clientHeight;
+        renderer.setPixelRatio(clamp(window.devicePixelRatio, 1, 2));
+        renderer.setSize(w, h, false);
+        camera.aspect = w / h; camera.updateProjectionMatrix();
+      };
+
+      // Lights
+      scene.add(new THREE.AmbientLight(0xffffff, 0.6));
+      const key = new THREE.DirectionalLight(0xffffff, 1.0); key.position.set(3,4,2); scene.add(key);
+      const fill = new THREE.DirectionalLight(0x88aaff, 0.4); fill.position.set(-2,2,-3); scene.add(fill);
+
+      // Materials
+      const wallMat = new THREE.MeshStandardMaterial({ color: '#e9e7e2', roughness: .8, metalness: .05 });
+      const floorMat = new THREE.MeshStandardMaterial({ color: '#1b242e', roughness: .6, metalness: .2 });
+      const accentMat = new THREE.MeshPhysicalMaterial({ color: '#c9b27a', metalness: 1, roughness: .35, clearcoat: .6 });
+
+      // Floorplan: simple boxes composing rooms
+      const group = new THREE.Group(); scene.add(group);
+      const floor = new THREE.Mesh(new THREE.PlaneGeometry(6, 4), floorMat);
+      floor.rotation.x = -Math.PI/2; group.add(floor);
+
+      const mkRoom = (w,d,h,y,color, name) => {
+        const mesh = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), new THREE.MeshStandardMaterial({ color: color || '#d6d2cc', roughness:.85 }));
+        mesh.position.set(0, h/2 + y, 0); mesh.userData.name = name; return mesh;
+      };
+      const bedroom = mkRoom(2.2, 1.8, 1.2, 0, '#efece6', 'Ložnice'); bedroom.position.set(-1.7, 0.6, -0.6);
+      const living  = mkRoom(2.8, 2.2, 1.2, 0, '#f3f1ec', 'Obývací pokoj'); living.position.set(1.2, 0.6, 0.0);
+      const spa     = mkRoom(1.2, 1.6, 1.2, 0, '#ebe7df', 'Wellness'); spa.position.set(-2.2, 0.6, 1.2);
+      group.add(bedroom, living, spa);
+
+      // Accents: balcony rail, kitchen island
+      const rail = new THREE.Mesh(new THREE.CylinderGeometry(0.02,0.02,2.6, 24), accentMat);
+      rail.rotation.z = Math.PI/2; rail.position.set(2.6, 0.9, -1.1); group.add(rail);
+      const island = new THREE.Mesh(new THREE.BoxGeometry(0.9,0.35,0.5), new THREE.MeshStandardMaterial({ color: '#323b46', roughness:.5, metalness:.4 }));
+      island.position.set(0.6, 0.175, 0.4); group.add(island);
+
+      // Hotspots
+      const hotspotGeo = new THREE.SphereGeometry(0.06, 16, 16);
+      const hotspotMat = new THREE.MeshStandardMaterial({ color: '#ffd166', emissive: '#ffd166', emissiveIntensity: 0.6 });
+      const mkHotspot = (x,y,z, label) => {
+        const m = new THREE.Mesh(hotspotGeo, hotspotMat.clone());
+        m.position.set(x,y,z); m.userData.label = label; group.add(m); return m;
+      };
+      const hs1 = mkHotspot(-1.7, 1.2, -0.6, 'Ložnice – dubová podlaha');
+      const hs2 = mkHotspot(0.6, 0.6, 0.4, 'Kuchyň – mramor & zlato');
+      const hs3 = mkHotspot(-2.2, 1.0, 1.2, 'Wellness – sauna & dešťová sprcha');
+
+      // Mode switching
+      const chips = document.querySelectorAll('.chip');
+      let mode = 'floorplan';
+      chips.forEach(ch => ch.addEventListener('click', ()=> {
+        chips.forEach(c=>c.classList.remove('active')); ch.classList.add('active');
+        mode = ch.dataset.mode;
+        if(mode === 'floorplan'){
+          gsap.to(group.rotation, { x: 0, y: 0, z: 0, duration: .8, ease: 'power2.inOut' });
+          gsap.to(camera.position, { x: 2.6, y: 2.0, z: 3.2, duration: .8, ease: 'power2.inOut' });
+        } else if(mode === 'interior'){
+          gsap.to(group.rotation, { x: 0, y: Math.PI/6, z: 0, duration: .8, ease: 'power2.inOut' });
+          gsap.to(camera.position, { x: 1.6, y: 1.2, z: 2.2, duration: .8, ease: 'power2.inOut' });
+        } else {
+          gsap.to(group.rotation, { x: -0.1, y: -Math.PI/8, z: 0, duration: .8, ease: 'power2.inOut' });
+          gsap.to(camera.position, { x: -1.2, y: 1.1, z: 2.0, duration: .8, ease: 'power2.inOut' });
+        }
+      }));
+
+      // Raycasting for hotspots highlight
+      const ray = new THREE.Raycaster(); const mouse = new THREE.Vector2();
+      let hovered = null;
+      canvas.addEventListener('pointermove', (e)=>{
+        const r = canvas.getBoundingClientRect();
+        mouse.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+        mouse.y = -((e.clientY - r.top) / r.height) * 2 + 1;
+      });
+
+      // Tooltip
+      const tip = document.createElement('div');
+      tip.style.position = 'absolute';
+      tip.style.background = 'rgba(0,0,0,.6)';
+      tip.style.color = '#fff'; tip.style.padding = '6px 8px';
+      tip.style.fontSize = '12px'; tip.style.borderRadius = '8px';
+      tip.style.pointerEvents = 'none'; tip.style.transform = 'translate(-50%,-140%)';
+      tip.style.whiteSpace = 'nowrap'; tip.style.opacity = '0';
+      canvas.parentElement.appendChild(tip);
+
+      function animate(){
+        controls.update();
+
+        // Hover logic
+        ray.setFromCamera(mouse, camera);
+        const intersects = ray.intersectObjects([hs1, hs2, hs3], false);
+        if(intersects.length){
+          const obj = intersects[0].object;
+          if(hovered !== obj){
+            if(hovered) hovered.material.emissiveIntensity = 0.6;
+            hovered = obj; hovered.material.emissiveIntensity = 1.2;
+          }
+          // Tooltip position
+          const p = obj.position.clone().project(camera);
+          const rect = canvas.getBoundingClientRect();
+          tip.style.left = ((p.x + 1)/2 * rect.width) + 'px';
+          tip.style.top = ((-p.y + 1)/2 * rect.height) + 'px';
+          tip.textContent = obj.userData.label;
+          tip.style.opacity = '1';
+        } else {
+          if(hovered){ hovered.material.emissiveIntensity = 0.6; hovered = null; }
+          tip.style.opacity = '0';
+        }
+
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+      }
+
+      const start = () => { resize(); window.addEventListener('resize', resize); animate(); };
+      start();
+    })();
+
+    // Gallery Ken Burns subtle parallax on scroll
+    gsap.utils.toArray('.photo img').forEach((img, i) => {
+      gsap.fromTo(img, { scale: 1.1, yPercent: -4 }, {
+        scale: 1.18, yPercent: 4, ease: 'none',
+        scrollTrigger: { trigger: img.parentElement, scrub: true, start: 'left right', end: 'right left', horizontal: true }
+      });
+    });
+
+    // Features float + tilt on hover (pseudo-3D)
+    document.querySelectorAll('.feature').forEach((el)=>{
+      el.addEventListener('pointermove', (e)=>{
+        const r = el.getBoundingClientRect();
+        const rx = ((e.clientY - r.top)/r.height - .5) * -6;
+        const ry = ((e.clientX - r.left)/r.width - .5) * 6;
+        el.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg)`;
+      });
+      el.addEventListener('pointerleave', ()=> el.style.transform = 'rotateX(0deg) rotateY(0deg)');
+      gsap.from(el, { y: 26, opacity: 0, duration: .6, ease: 'power2.out', scrollTrigger: { trigger: el, start: 'top 85%' }});
+    });
+
+    // Reviews tilt cards + star sparkle
+    document.querySelectorAll('.review').forEach((wrap)=>{
+      const card = wrap.querySelector('.card');
+      wrap.addEventListener('pointermove', (e)=>{
+        const r = wrap.getBoundingClientRect();
+        const rx = ((e.clientY - r.top)/r.height - .5) * -8;
+        const ry = ((e.clientX - r.left)/r.width - .5) * 8;
+        card.style.transform = `rotateX(${rx}deg) rotateY(${ry}deg) translateZ(10px)`;
+      });
+      wrap.addEventListener('pointerleave', ()=> card.style.transform = 'rotateX(0) rotateY(0) translateZ(0)');
+      const stars = card.querySelector('.stars');
+      gsap.to(stars, { textShadow: '0 0 12px #ffd166', repeat: -1, yoyo: true, duration: 1.6, ease: 'sine.inOut' });
+    });
+
+    // Social physics-like pop
+    document.querySelectorAll('[data-pop]').forEach(el=>{
+      el.addEventListener('pointerenter', ()=> gsap.to(el, { y: -6, scale: 1.06, duration: .25, ease: 'power2.out' }));
+      el.addEventListener('pointerleave', ()=> gsap.to(el, { y: 0, scale: 1.0, duration: .3, ease: 'power2.out' }));
+    });
+
+    // Contact modal + Three.js particles background
+    const contactModal = document.getElementById('contactModal');
+    const openBtns = [document.getElementById('contact-open'), document.getElementById('contactOpen2')].filter(Boolean);
+    const closeBtn = document.getElementById('contactClose');
+    openBtns.forEach(b => b && b.addEventListener('click', ()=> {
+      contactModal.classList.add('open');
+      gsap.fromTo('.modal__panel', { y: 30, opacity: 0 }, { y: 0, opacity: 1, duration: .4, ease: 'power2.out' });
+    }));
+    closeBtn.addEventListener('click', ()=> contactModal.classList.remove('open'));
+    contactModal.addEventListener('click', (e)=> { if(e.target === contactModal) contactModal.classList.remove('open'); });
+
+    ;(function modalParticles(){
+      const canvas = document.getElementById('modal-canvas');
+      const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+      const scene = new THREE.Scene();
+      const camera = new THREE.PerspectiveCamera(50, 1, 0.1, 100); camera.position.z = 6;
+
+      const geo = new THREE.BufferGeometry();
+      const COUNT = 800;
+      const positions = new Float32Array(COUNT * 3);
+      for(let i=0;i<COUNT;i++){
+        positions[i*3+0] = (Math.random()-0.5)*10;
+        positions[i*3+1] = (Math.random()-0.5)*6;
+        positions[i*3+2] = (Math.random()-0.5)*3;
+      }
+      geo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+      const mat = new THREE.PointsMaterial({ color: 0x89a8ff, size: 0.02, transparent: true, opacity: .7 });
+      const points = new THREE.Points(geo, mat); scene.add(points);
+
+      const resize = () => {
+        const r = canvas.getBoundingClientRect();
+        renderer.setPixelRatio(clamp(window.devicePixelRatio, 1, 2));
+        renderer.setSize(r.width, r.height, false);
+        camera.aspect = r.width / r.height || 1; camera.updateProjectionMatrix();
+      };
+      const onOpenResize = () => { if(contactModal.classList.contains('open')) resize(); };
+
+      let t = 0;
+      function animate(){
+        t += 0.004;
+        points.rotation.y = t*0.7;
+        renderer.render(scene, camera);
+        requestAnimationFrame(animate);
+      }
+      new ResizeObserver(onOpenResize).observe(document.body);
+      resize(); animate();
+    })();
+
+    // Booking buttons confetti-like effect (CSS-less simple)
+    function burst(x, y) {
+      for(let i=0;i<16;i++){
+        const el = document.createElement('span');
+        el.style.position = 'fixed';
+        el.style.left = x + 'px'; el.style.top = y + 'px';
+        el.style.width = '6px'; el.style.height = '6px'; el.style.borderRadius = '50%';
+        el.style.background = i % 2 ? '#d7b77a' : '#a0c4ff';
+        el.style.pointerEvents = 'none'; el.style.zIndex = 1000; document.body.appendChild(el);
+        const dx = (Math.random()-0.5) * 160; const dy = (Math.random()-0.8) * 180;
+        gsap.to(el, { x: dx, y: dy, scale: 0, duration: .9, ease: 'power3.out', onComplete: ()=> el.remove() });
+      }
+    }
+    const bookNow = document.getElementById('bookNow');
+    const bookFloating = document.getElementById('bookFloating');
+    [bookNow, bookFloating].forEach(btn=>{
+      btn.addEventListener('click', (e)=> {
+        burst(e.clientX, e.clientY);
+        // Zde integrujte skutečnou rezervaci (odeslání formuláře / přesměrování)
+      });
+    });
+  </script>
+</body>
+</html>

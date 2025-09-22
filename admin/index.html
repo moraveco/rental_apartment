@@ -1,0 +1,2052 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel - Ubytování u Moravců</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <style>
+        :root {
+            --primary-gold: #D4AF37;
+            --primary-navy: #1a2332;
+            --accent-copper: #B87333;
+            --neutral-ivory: #FDF6E3;
+            --neutral-taupe: #8B7355;
+            --neutral-beige: #F5F5DC;
+            --glass-bg: rgba(255, 255, 255, 0.1);
+            --glass-border: rgba(255, 255, 255, 0.2);
+            --luxury-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --glow-gold: 0 0 20px rgba(212, 175, 55, 0.3);
+            --text-dark: #2c2c2c;
+            --text-light: #6b7280;
+            --success-green: #10b981;
+            --error-red: #ef4444;
+            --warning-orange: #f59e0b;
+            --info-blue: #3b82f6;
+            --sidebar-width: 280px;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--neutral-ivory), var(--neutral-beige));
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            position: fixed;
+            left: 0;
+            top: 0;
+            width: var(--sidebar-width);
+            height: 100vh;
+            background: var(--primary-navy);
+            z-index: 1000;
+            transition: transform 0.3s ease;
+            overflow-y: auto;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-100%);
+        }
+
+        .sidebar-header {
+            padding: 30px 25px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .admin-logo {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary-gold);
+            text-decoration: none;
+            display: block;
+            margin-bottom: 10px;
+        }
+
+        .admin-subtitle {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+        }
+
+        .sidebar-nav {
+            padding: 30px 0;
+        }
+
+        .nav-section {
+            margin-bottom: 30px;
+        }
+
+        .nav-section-title {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 0 25px 15px;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 15px 25px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s ease;
+            position: relative;
+            border: none;
+            background: none;
+            width: 100%;
+            text-align: left;
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--primary-gold);
+            padding-left: 35px;
+        }
+
+        .nav-item.active {
+            background: rgba(212, 175, 55, 0.2);
+            color: var(--primary-gold);
+            border-right: 3px solid var(--primary-gold);
+        }
+
+        .nav-item i {
+            width: 20px;
+            margin-right: 15px;
+            font-size: 1.1rem;
+        }
+
+        .nav-badge {
+            background: var(--error-red);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            float: right;
+            margin-top: 2px;
+        }
+
+        .nav-badge.warning {
+            background: var(--warning-orange);
+        }
+
+        .nav-badge.success {
+            background: var(--success-green);
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            min-height: 100vh;
+            transition: margin-left 0.3s ease;
+        }
+
+        .main-content.expanded {
+            margin-left: 0;
+        }
+
+        /* Top Bar */
+        .top-bar {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--glass-border);
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 999;
+            box-shadow: var(--luxury-shadow);
+        }
+
+        .top-bar-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .sidebar-toggle {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            color: var(--primary-navy);
+            transition: all 0.3s ease;
+        }
+
+        .sidebar-toggle:hover {
+            background: var(--primary-gold);
+            color: white;
+            transform: scale(1.05);
+        }
+
+        .page-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.8rem;
+            color: var(--primary-navy);
+            font-weight: 600;
+        }
+
+        .top-bar-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .notifications {
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification-icon {
+            font-size: 1.2rem;
+            color: var(--primary-navy);
+            padding: 10px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .notification-icon:hover {
+            background: var(--primary-gold);
+            color: white;
+        }
+
+        .notification-count {
+            position: absolute;
+            top: -5px;
+            right: -5px;
+            background: var(--error-red);
+            color: white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            font-size: 0.7rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .admin-profile {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 15px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 25px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .admin-profile:hover {
+            background: rgba(212, 175, 55, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .admin-avatar {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-gold), var(--accent-copper));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .admin-info {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .admin-name {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--primary-navy);
+        }
+
+        .admin-role {
+            font-size: 0.8rem;
+            color: var(--text-light);
+        }
+
+        /* Content Area */
+        .content-area {
+            padding: 30px;
+            min-height: calc(100vh - 80px);
+        }
+
+        /* Dashboard Grid */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stat-card {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px 25px;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-gold), var(--accent-copper));
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .stat-card:hover::before {
+            opacity: 0.05;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--luxury-shadow);
+        }
+
+        .stat-icon {
+            width: 60px;
+            height: 60px;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            color: white;
+            margin-bottom: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .stat-icon.revenue {
+            background: linear-gradient(135deg, var(--success-green), #059669);
+        }
+
+        .stat-icon.bookings {
+            background: linear-gradient(135deg, var(--info-blue), #2563eb);
+        }
+
+        .stat-icon.guests {
+            background: linear-gradient(135deg, var(--warning-orange), #d97706);
+        }
+
+        .stat-icon.occupancy {
+            background: linear-gradient(135deg, var(--primary-gold), var(--accent-copper));
+        }
+
+        .stat-value {
+            font-size: 2.2rem;
+            font-weight: 700;
+            color: var(--primary-navy);
+            margin-bottom: 8px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-weight: 500;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            position: relative;
+            z-index: 2;
+        }
+
+        .stat-change.positive {
+            color: var(--success-green);
+        }
+
+        .stat-change.negative {
+            color: var(--error-red);
+        }
+
+        /* Data Table */
+        .data-section {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            margin-bottom: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .data-section::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-gold), var(--accent-copper));
+            opacity: 0.01;
+            pointer-events: none;
+        }
+
+        .section-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .section-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--primary-navy);
+            font-weight: 600;
+        }
+
+        .section-actions {
+            display: flex;
+            gap: 15px;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.9rem;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary-gold), var(--accent-copper));
+            color: white;
+            box-shadow: var(--glow-gold);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 0 25px rgba(212, 175, 55, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            color: var(--text-dark);
+        }
+
+        .btn-secondary:hover {
+            background: rgba(212, 175, 55, 0.1);
+            border-color: var(--primary-gold);
+        }
+
+        .search-filter {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .search-input {
+            flex: 1;
+            padding: 12px 20px 12px 45px;
+            border: 2px solid var(--glass-border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-gold);
+            box-shadow: var(--glow-gold);
+        }
+
+        .search-wrapper {
+            position: relative;
+            flex: 1;
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-size: 1rem;
+        }
+
+        .filter-select {
+            padding: 12px 15px;
+            border: 2px solid var(--glass-border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .filter-select:focus {
+            outline: none;
+            border-color: var(--primary-gold);
+            box-shadow: var(--glow-gold);
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            position: relative;
+            z-index: 2;
+        }
+
+        .data-table th {
+            background: rgba(212, 175, 55, 0.1);
+            color: var(--primary-navy);
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+            border-bottom: 2px solid rgba(212, 175, 55, 0.2);
+            position: sticky;
+            top: 0;
+        }
+
+        .data-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid rgba(212, 175, 55, 0.1);
+            vertical-align: middle;
+        }
+
+        .data-table tr:hover {
+            background: rgba(212, 175, 55, 0.05);
+        }
+
+        .status-badge {
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .status-confirmed {
+            background: rgba(16, 185, 129, 0.1);
+            color: var(--success-green);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+        }
+
+        .status-pending {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-orange);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+        }
+
+        .status-cancelled {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error-red);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 8px;
+        }
+
+        .action-btn {
+            width: 35px;
+            height: 35px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+        }
+
+        .action-btn.view {
+            background: rgba(59, 130, 246, 0.1);
+            color: var(--info-blue);
+        }
+
+        .action-btn.edit {
+            background: rgba(245, 158, 11, 0.1);
+            color: var(--warning-orange);
+        }
+
+        .action-btn.delete {
+            background: rgba(239, 68, 68, 0.1);
+            color: var(--error-red);
+        }
+
+        .action-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 2000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 40px;
+            max-width: 600px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            position: relative;
+            transform: scale(0.9);
+            transition: transform 0.3s ease;
+        }
+
+        .modal.show .modal-content {
+            transform: scale(1);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .modal-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: var(--primary-navy);
+        }
+
+        .modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--text-light);
+            cursor: pointer;
+            transition: color 0.3s ease;
+        }
+
+        .modal-close:hover {
+            color: var(--error-red);
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-dark);
+            font-weight: 500;
+        }
+
+        .form-input, .form-select, .form-textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 2px solid var(--glass-border);
+            border-radius: 10px;
+            background: rgba(255, 255, 255, 0.8);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus, .form-select:focus, .form-textarea:focus {
+            outline: none;
+            border-color: var(--primary-gold);
+            box-shadow: var(--glow-gold);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        /* Charts Container */
+        .charts-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 30px;
+            margin-bottom: 40px;
+        }
+
+        .chart-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--glass-border);
+            border-radius: 20px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .chart-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, var(--primary-gold), var(--accent-copper));
+            opacity: 0.01;
+            pointer-events: none;
+        }
+
+        .chart-header {
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .chart-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.3rem;
+            color: var(--primary-navy);
+            margin-bottom: 5px;
+        }
+
+        .chart-subtitle {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .chart-placeholder {
+            height: 300px;
+            background: linear-gradient(135deg, #f0f0f0, #e0e0e0);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-light);
+            font-size: 1.1rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 1024px) {
+            .sidebar {
+                transform: translateX(-100%);
+            }
+
+            .sidebar.show {
+                transform: translateX(0);
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .charts-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .top-bar {
+                padding: 15px 20px;
+                flex-wrap: wrap;
+                gap: 15px;
+            }
+
+            .content-area {
+                padding: 20px;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .search-filter {
+                flex-direction: column;
+                gap: 10px;
+            }
+
+            .section-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+
+            .data-table {
+                font-size: 0.9rem;
+            }
+
+            .data-table th,
+            .data-table td {
+                padding: 10px 15px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .admin-info {
+                display: none;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .modal-content {
+                padding: 25px;
+                width: 95%;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 5px;
+            }
+
+            .stat-card {
+                padding: 20px;
+            }
+
+            .stat-value {
+                font-size: 1.8rem;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease;
+        }
+
+        /* Custom scrollbar */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--primary-gold);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent-copper);
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <a href="#" class="admin-logo">Moravci Admin</a>
+            <div class="admin-subtitle">Správa ubytování</div>
+        </div>
+
+        <nav class="sidebar-nav">
+            <div class="nav-section">
+                <div class="nav-section-title">Hlavní</div>
+                <button class="nav-item active" data-section="dashboard">
+                    <i class="fas fa-tachometer-alt"></i> Dashboard
+                </button>
+                <button class="nav-item" data-section="reservations">
+                    <i class="fas fa-calendar-check"></i> Rezervace
+                    <span class="nav-badge">12</span>
+                </button>
+                <button class="nav-item" data-section="guests">
+                    <i class="fas fa-users"></i> Hosté
+                </button>
+                <button class="nav-item" data-section="calendar">
+                    <i class="fas fa-calendar"></i> Kalendář
+                </button>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Správa</div>
+                <button class="nav-item" data-section="rooms">
+                    <i class="fas fa-bed"></i> Apartmány
+                </button>
+                <button class="nav-item" data-section="services">
+                    <i class="fas fa-concierge-bell"></i> Služby
+                </button>
+                <button class="nav-item" data-section="pricing">
+                    <i class="fas fa-tag"></i> Ceník
+                </button>
+                <button class="nav-item" data-section="reviews">
+                    <i class="fas fa-star"></i> Recenze
+                    <span class="nav-badge warning">3</span>
+                </button>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Finance</div>
+                <button class="nav-item" data-section="payments">
+                    <i class="fas fa-credit-card"></i> Platby
+                </button>
+                <button class="nav-item" data-section="reports">
+                    <i class="fas fa-chart-line"></i> Reporty
+                </button>
+                <button class="nav-item" data-section="invoices">
+                    <i class="fas fa-file-invoice"></i> Faktury
+                </button>
+            </div>
+
+            <div class="nav-section">
+                <div class="nav-section-title">Systém</div>
+                <button class="nav-item" data-section="settings">
+                    <i class="fas fa-cog"></i> Nastavení
+                </button>
+                <button class="nav-item" data-section="users">
+                    <i class="fas fa-user-shield"></i> Uživatelé
+                </button>
+                <button class="nav-item" data-section="logs">
+                    <i class="fas fa-list-alt"></i> Logy
+                </button>
+            </div>
+        </nav>
+    </div>
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <!-- Top Bar -->
+        <div class="top-bar">
+            <div class="top-bar-left">
+                <button class="sidebar-toggle" id="sidebarToggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1 class="page-title" id="pageTitle">Dashboard</h1>
+            </div>
+            <div class="top-bar-right">
+                <div class="notifications">
+                    <div class="notification-icon">
+                        <i class="fas fa-bell"></i>
+                    </div>
+                    <div class="notification-count">5</div>
+                </div>
+                <div class="admin-profile">
+                    <div class="admin-avatar">JM</div>
+                    <div class="admin-info">
+                        <div class="admin-name">Jan Moravec</div>
+                        <div class="admin-role">Administrátor</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="content-area">
+            <!-- Dashboard Section -->
+            <div id="dashboard" class="content-section active">
+                <!-- Stats Grid -->
+                <div class="dashboard-grid fade-in">
+                    <div class="stat-card">
+                        <div class="stat-icon revenue">
+                            <i class="fas fa-euro-sign"></i>
+                        </div>
+                        <div class="stat-value">847 360 Kč</div>
+                        <div class="stat-label">Měsíční příjmy</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +12.5%
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon bookings">
+                            <i class="fas fa-calendar-check"></i>
+                        </div>
+                        <div class="stat-value">47</div>
+                        <div class="stat-label">Rezervace tento měsíc</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +8.3%
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon guests">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <div class="stat-value">127</div>
+                        <div class="stat-label">Celkem hostů</div>
+                        <div class="stat-change positive">
+                            <i class="fas fa-arrow-up"></i>
+                            +15.2%
+                        </div>
+                    </div>
+
+                    <div class="stat-card">
+                        <div class="stat-icon occupancy">
+                            <i class="fas fa-percentage"></i>
+                        </div>
+                        <div class="stat-value">87%</div>
+                        <div class="stat-label">Obsazenost</div>
+                        <div class="stat-change negative">
+                            <i class="fas fa-arrow-down"></i>
+                            -3.1%
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Charts -->
+                <div class="charts-grid fade-in">
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <div class="chart-title">Přehled rezervací</div>
+                            <div class="chart-subtitle">Posledních 12 měsíců</div>
+                        </div>
+                        <div class="chart-placeholder">
+                            <i class="fas fa-chart-line" style="font-size: 3rem; margin-right: 15px;"></i>
+                            Graf rezervací za rok
+                        </div>
+                    </div>
+
+                    <div class="chart-container">
+                        <div class="chart-header">
+                            <div class="chart-title">Typ hostů</div>
+                            <div class="chart-subtitle">Rozložení návštěvníků</div>
+                        </div>
+                        <div class="chart-placeholder">
+                            <i class="fas fa-chart-pie" style="font-size: 3rem; margin-right: 15px;"></i>
+                            Koláčový graf hostů
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Recent Reservations -->
+                <div class="data-section fade-in">
+                    <div class="section-header">
+                        <h2 class="section-title">Nejnovější rezervace</h2>
+                        <div class="section-actions">
+                            <a href="#" class="btn btn-secondary">
+                                <i class="fas fa-download"></i> Export
+                            </a>
+                            <a href="#" class="btn btn-primary">
+                                <i class="fas fa-plus"></i> Nová rezervace
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="search-filter">
+                        <div class="search-wrapper">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="search-input" placeholder="Hledat rezervace...">
+                        </div>
+                        <select class="filter-select">
+                            <option>Všechny stavy</option>
+                            <option>Potvrzené</option>
+                            <option>Čekající</option>
+                            <option>Zrušené</option>
+                        </select>
+                        <select class="filter-select">
+                            <option>Tento měsíc</option>
+                            <option>Minulý měsíc</option>
+                            <option>Posledních 3 měsíce</option>
+                            <option>Tento rok</option>
+                        </select>
+                    </div>
+
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Rezervace #</th>
+                                    <th>Host</th>
+                                    <th>Příjezd</th>
+                                    <th>Odjezd</th>
+                                    <th>Hosté</th>
+                                    <th>Cena</th>
+                                    <th>Stav</th>
+                                    <th>Akce</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>REZ-2025-00847</strong></td>
+                                    <td>Jan Novák</td>
+                                    <td>15. 8. 2025</td>
+                                    <td>18. 8. 2025</td>
+                                    <td>2</td>
+                                    <td><strong>11 616 Kč</strong></td>
+                                    <td><span class="status-badge status-confirmed">Potvrzeno</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn view" title="Zobrazit">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Upravit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Smazat">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>REZ-2025-00846</strong></td>
+                                    <td>Marie Svobodová</td>
+                                    <td>12. 8. 2025</td>
+                                    <td>15. 8. 2025</td>
+                                    <td>1</td>
+                                    <td><strong>6 300 Kč</strong></td>
+                                    <td><span class="status-badge status-pending">Čekající</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn view" title="Zobrazit">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Upravit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Smazat">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>REZ-2025-00845</strong></td>
+                                    <td>Petr Dvořák</td>
+                                    <td>10. 8. 2025</td>
+                                    <td>14. 8. 2025</td>
+                                    <td>4</td>
+                                    <td><strong>18 900 Kč</strong></td>
+                                    <td><span class="status-badge status-confirmed">Potvrzeno</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn view" title="Zobrazit">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Upravit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Smazat">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>REZ-2025-00844</strong></td>
+                                    <td>Anna Procházková</td>
+                                    <td>8. 8. 2025</td>
+                                    <td>10. 8. 2025</td>
+                                    <td>2</td>
+                                    <td><strong>7 800 Kč</strong></td>
+                                    <td><span class="status-badge status-cancelled">Zrušeno</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn view" title="Zobrazit">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Upravit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Smazat">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td><strong>REZ-2025-00843</strong></td>
+                                    <td>Tomáš Krejčí</td>
+                                    <td>5. 8. 2025</td>
+                                    <td>8. 8. 2025</td>
+                                    <td>3</td>
+                                    <td><strong>12 450 Kč</strong></td>
+                                    <td><span class="status-badge status-confirmed">Potvrzeno</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn view" title="Zobrazit">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Upravit">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Smazat">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Reservations Section -->
+            <div id="reservations" class="content-section" style="display: none;">
+                <div class="data-section fade-in">
+                    <div class="section-header">
+                        <h2 class="section-title">Správa rezervací</h2>
+                        <div class="section-actions">
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-filter"></i> Filtr
+                            </button>
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-download"></i> Export
+                            </button>
+                            <button class="btn btn-primary" onclick="openModal('newReservationModal')">
+                                <i class="fas fa-plus"></i> Nová rezervace
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="search-filter">
+                        <div class="search-wrapper">
+                            <i class="fas fa-search search-icon"></i>
+                            <input type="text" class="search-input" placeholder="Hledat podle jména, emailu nebo čísla rezervace...">
+                        </div>
+                        <select class="filter-select">
+                            <option>Všechny stavy</option>
+                            <option>Potvrzené</option>
+                            <option>Čekající na potvrzení</option>
+                            <option>Zaplacené</option>
+                            <option>Check-in dnes</option>
+                            <option>Check-out dnes</option>
+                            <option>Zrušené</option>
+                        </select>
+                        <select class="filter-select">
+                            <option>Všechny apartmány</option>
+                            <option>Luxusní apartmá</option>
+                            <option>Standardní apartmá</option>
+                            <option>VIP apartmá</option>
+                        </select>
+                        <input type="date" class="filter-select" placeholder="Od data">
+                        <input type="date" class="filter-select" placeholder="Do data">
+                    </div>
+
+                    <!-- Enhanced reservation table with more details -->
+                    <div style="overflow-x: auto;">
+                        <table class="data-table">
+                            <thead>
+                                <tr>
+                                    <th>Rezervace</th>
+                                    <th>Host</th>
+                                    <th>Kontakt</th>
+                                    <th>Termín</th>
+                                    <th>Apartmá</th>
+                                    <th>Hosté</th>
+                                    <th>Služby</th>
+                                    <th>Cena</th>
+                                    <th>Platba</th>
+                                    <th>Stav</th>
+                                    <th>Akce</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>
+                                        <div><strong>REZ-2025-00847</strong></div>
+                                        <div style="font-size: 0.8rem; color: var(--text-light);">
+                                            Vytvořeno: 1. 8. 2025
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div><strong>Jan Novák</strong></div>
+                                        <div style="font-size: 0.8rem; color: var(--text-light);">
+                                            Pravidelný host
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div>jan.novak@email.cz</div>
+                                        <div style="font-size: 0.8rem; color: var(--text-light);">
+                                            +420 777 123 456
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <div><strong>15. - 18. 8. 2025</strong></div>
+                                        <div style="font-size: 0.8rem; color: var(--text-light);">
+                                            3 noci
+                                        </div>
+                                    </td>
+                                    <td>Luxusní apartmá</td>
+                                    <td>2 dospělí</td>
+                                    <td>
+                                        <div style="font-size: 0.8rem;">
+                                            <div>• Transfer</div>
+                                            <div>• Večeře</div>
+                                            <div>• Concierge</div>
+                                        </div>
+                                    </td>
+                                    <td><strong>11 616 Kč</strong></td>
+                                    <td><span class="status-badge status-confirmed">Zaplaceno</span></td>
+                                    <td><span class="status-badge status-confirmed">Potvrzeno</span></td>
+                                    <td>
+                                        <div class="action-buttons">
+                                            <button class="action-btn view" title="Detail rezervace" onclick="openModal('reservationDetailModal')">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn edit" title="Upravit rezervaci">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn" style="background: rgba(16, 185, 129, 0.1); color: var(--success-green);" title="Check-in">
+                                                <i class="fas fa-sign-in-alt"></i>
+                                            </button>
+                                            <button class="action-btn delete" title="Zrušit rezervaci">
+                                                <i class="fas fa-times"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <!-- More reservation rows would be here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Other sections would be similar structures -->
+            <div id="guests" class="content-section" style="display: none;">
+                <div class="data-section fade-in">
+                    <div class="section-header">
+                        <h2 class="section-title">Databáze hostů</h2>
+                        <div class="section-actions">
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-download"></i> Export kontaktů
+                            </button>
+                            <button class="btn btn-primary">
+                                <i class="fas fa-user-plus"></i> Přidat hosta
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-placeholder">
+                        <i class="fas fa-users" style="font-size: 3rem; margin-right: 15px;"></i>
+                        Sekce Hosté - Databáze všech hostů s kontakty a historií pobytů
+                    </div>
+                </div>
+            </div>
+
+            <div id="calendar" class="content-section" style="display: none;">
+                <div class="data-section fade-in">
+                    <div class="section-header">
+                        <h2 class="section-title">Kalendář rezervací</h2>
+                        <div class="section-actions">
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-print"></i> Tisk
+                            </button>
+                            <button class="btn btn-primary">
+                                <i class="fas fa-calendar-plus"></i> Blokovat termín
+                            </button>
+                        </div>
+                    </div>
+                    <div class="chart-placeholder">
+                        <i class="fas fa-calendar-alt" style="font-size: 3rem; margin-right: 15px;"></i>
+                        Kalendářové zobrazení všech rezervací a dostupnosti apartmánů
+                    </div>
+                </div>
+            </div>
+
+            <div id="settings" class="content-section" style="display: none;">
+                <div class="data-section fade-in">
+                    <div class="section-header">
+                        <h2 class="section-title">Nastavení systému</h2>
+                    </div>
+                    <div class="chart-placeholder">
+                        <i class="fas fa-cogs" style="font-size: 3rem; margin-right: 15px;"></i>
+                        Konfigurace systému, ceník, platební metody, notifikace
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- New Reservation Modal -->
+    <div id="newReservationModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Nová rezervace</h2>
+                <button class="modal-close" onclick="closeModal('newReservationModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <form id="newReservationForm">
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="guestName">Jméno hosta *</label>
+                        <input type="text" id="guestName" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="guestEmail">Email *</label>
+                        <input type="email" id="guestEmail" class="form-input" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="guestPhone">Telefon *</label>
+                        <input type="tel" id="guestPhone" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="guestCount">Počet hostů *</label>
+                        <select id="guestCount" class="form-select" required>
+                            <option value="">Vyberte počet</option>
+                            <option value="1">1 host</option>
+                            <option value="2">2 hosté</option>
+                            <option value="3">3 hosté</option>
+                            <option value="4">4 hosté</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="checkIn">Příjezd *</label>
+                        <input type="date" id="checkIn" class="form-input" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="checkOut">Odjezd *</label>
+                        <input type="date" id="checkOut" class="form-input" required>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="roomType">Typ apartmánu *</label>
+                        <select id="roomType" class="form-select" required>
+                            <option value="">Vyberte apartmá</option>
+                            <option value="luxury">Luxusní apartmá</option>
+                            <option value="standard">Standardní apartmá</option>
+                            <option value="vip">VIP apartmá</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="totalPrice">Celková cena</label>
+                        <input type="number" id="totalPrice" class="form-input" placeholder="Automaticky vypočítáno">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="specialRequests">Speciální požadavky</label>
+                    <textarea id="specialRequests" class="form-textarea" placeholder="Poznámky, speciální požadavky..."></textarea>
+                </div>
+
+                <div style="display: flex; gap: 15px; margin-top: 30px;">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal('newReservationModal')" style="flex: 1;">
+                        Zrušit
+                    </button>
+                    <button type="submit" class="btn btn-primary" style="flex: 2;">
+                        <i class="fas fa-save"></i> Vytvořit rezervaci
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Reservation Detail Modal -->
+    <div id="reservationDetailModal" class="modal">
+        <div class="modal-content" style="max-width: 800px;">
+            <div class="modal-header">
+                <h2 class="modal-title">Detail rezervace REZ-2025-00847</h2>
+                <button class="modal-close" onclick="closeModal('reservationDetailModal')">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 30px;">
+                <div>
+                    <h3 style="color: var(--primary-navy); margin-bottom: 15px; font-family: 'Playfair Display', serif;">Informace o hostovi</h3>
+                    <div style="background: rgba(255, 255, 255, 0.5); padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+                        <div style="margin-bottom: 10px;"><strong>Jméno:</strong> Jan Novák</div>
+                        <div style="margin-bottom: 10px;"><strong>Email:</strong> jan.novak@email.cz</div>
+                        <div style="margin-bottom: 10px;"><strong>Telefon:</strong> +420 777 123 456</div>
+                        <div style="margin-bottom: 10px;"><strong>Počet pobytů:</strong> 3. pobyt</div>
+                        <div><strong>VIP host:</strong> <span style="color: var(--primary-gold);">Ano</span></div>
+                    </div>
+
+                    <h3 style="color: var(--primary-navy); margin-bottom: 15px; font-family: 'Playfair Display', serif;">Historie plateb</h3>
+                    <div style="background: rgba(255, 255, 255, 0.5); padding: 20px; border-radius: 15px;">
+                        <div style="margin-bottom: 10px;">
+                            <strong>Záloha:</strong> 3 500 Kč 
+                            <span style="color: var(--success-green); font-size: 0.8rem;">(zaplaceno)</span>
+                        </div>
+                        <div style="margin-bottom: 10px;">
+                            <strong>Doplatek:</strong> 8 116 Kč 
+                            <span style="color: var(--success-green); font-size: 0.8rem;">(zaplaceno)</span>
+                        </div>
+                        <div style="border-top: 1px solid rgba(212, 175, 55, 0.3); padding-top: 10px; margin-top: 10px;">
+                            <strong>Celkem:</strong> 11 616 Kč
+                        </div>
+                    </div>
+                </div>
+
+                <div>
+                    <h3 style="color: var(--primary-navy); margin-bottom: 15px; font-family: 'Playfair Display', serif;">Detaily pobytu</h3>
+                    <div style="background: rgba(255, 255, 255, 0.5); padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+                        <div style="margin-bottom: 10px;"><strong>Příjezd:</strong> 15. srpna 2025, 14:00</div>
+                        <div style="margin-bottom: 10px;"><strong>Odjezd:</strong> 18. srpna 2025, 11:00</div>
+                        <div style="margin-bottom: 10px;"><strong>Počet nocí:</strong> 3</div>
+                        <div style="margin-bottom: 10px;"><strong>Apartmá:</strong> Luxusní apartmá</div>
+                        <div><strong>Hosté:</strong> 2 dospělí</div>
+                    </div>
+
+                    <h3 style="color: var(--primary-navy); margin-bottom: 15px; font-family: 'Playfair Display', serif;">Doplňkové služby</h3>
+                    <div style="background: rgba(255, 255, 255, 0.5); padding: 20px; border-radius: 15px;">
+                        <div style="margin-bottom: 8px;">• Transfer z letiště (800 Kč)</div>
+                        <div style="margin-bottom: 8px;">• Romantická večeře (2 500 Kč)</div>
+                        <div style="margin-bottom: 8px;">• Osobní concierge 3 dny (1 800 Kč)</div>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid rgba(212, 175, 55, 0.3);">
+                <div style="display: flex; gap: 15px;">
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-print"></i> Tisk
+                    </button>
+                    <button class="btn btn-secondary">
+                        <i class="fas fa-envelope"></i> Email hostovi
+                    </button>
+                    <button class="btn btn-primary">
+                        <i class="fas fa-edit"></i> Upravit rezervaci
+                    </button>
+                    <button class="btn" style="background: var(--success-green); color: white;">
+                        <i class="fas fa-check"></i> Check-in
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Sidebar functionality
+        const sidebar = document.getElementById('sidebar');
+        const mainContent = document.getElementById('mainContent');
+        const sidebarToggle = document.getElementById('sidebarToggle');
+        const pageTitle = document.getElementById('pageTitle');
+
+        sidebarToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('collapsed');
+            mainContent.classList.toggle('expanded');
+        });
+
+        // Navigation
+        const navItems = document.querySelectorAll('.nav-item');
+        const contentSections = document.querySelectorAll('.content-section');
+
+        navItems.forEach(item => {
+            item.addEventListener('click', () => {
+                // Remove active class from all nav items
+                navItems.forEach(nav => nav.classList.remove('active'));
+                // Add active class to clicked item
+                item.classList.add('active');
+
+                // Hide all content sections
+                contentSections.forEach(section => {
+                    section.style.display = 'none';
+                    section.classList.remove('active');
+                });
+
+                // Show selected section
+                const sectionId = item.dataset.section;
+                const targetSection = document.getElementById(sectionId);
+                if (targetSection) {
+                    targetSection.style.display = 'block';
+                    targetSection.classList.add('active');
+                    
+                    // Update page title
+                    const sectionTitles = {
+                        'dashboard': 'Dashboard',
+                        'reservations': 'Rezervace',
+                        'guests': 'Hosté',
+                        'calendar': 'Kalendář',
+                        'rooms': 'Apartmány',
+                        'services': 'Služby',
+                        'pricing': 'Ceník',
+                        'reviews': 'Recenze',
+                        'payments': 'Platby',
+                        'reports': 'Reporty',
+                        'invoices': 'Faktury',
+                        'settings': 'Nastavení',
+                        'users': 'Uživatelé',
+                        'logs': 'Logy'
+                    };
+                    pageTitle.textContent = sectionTitles[sectionId] || 'Admin Panel';
+                }
+            });
+        });
+
+        // Modal functionality
+        function openModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.add('show');
+                document.body.style.overflow = 'hidden';
+            }
+        }
+
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                modal.classList.remove('show');
+                document.body.style.overflow = '';
+            }
+        }
+
+        // Close modal when clicking outside
+        document.querySelectorAll('.modal').forEach(modal => {
+            modal.addEventListener('click', (e) => {
+                if (e.target === modal) {
+                    modal.classList.remove('show');
+                    document.body.style.overflow = '';
+                }
+            });
+        });
+
+        // Search functionality
+        const searchInputs = document.querySelectorAll('.search-input');
+        searchInputs.forEach(input => {
+            input.addEventListener('input', (e) => {
+                const searchTerm = e.target.value.toLowerCase();
+                const table = e.target.closest('.data-section').querySelector('.data-table tbody');
+                
+                if (table) {
+                    const rows = table.querySelectorAll('tr');
+                    rows.forEach(row => {
+                        const text = row.textContent.toLowerCase();
+                        row.style.display = text.includes(searchTerm) ? '' : 'none';
+                    });
+                }
+            });
+        });
+
+        // Form handling
+        document.getElementById('newReservationForm').addEventListener('submit', (e) => {
+            e.preventDefault();
+            
+            // Get form data
+            const formData = new FormData(e.target);
+            const reservationData = {
+                guestName: formData.get('guestName'),
+                guestEmail: formData.get('guestEmail'),
+                guestPhone: formData.get('guestPhone'),
+                guestCount: formData.get('guestCount'),
+                checkIn: formData.get('checkIn'),
+                checkOut: formData.get('checkOut'),
+                roomType: formData.get('roomType'),
+                totalPrice: formData.get('totalPrice'),
+                specialRequests: formData.get('specialRequests')
+            };
+
+            // Simulate API call
+            const submitBtn = e.target.querySelector('button[type="submit"]');
+            const originalText = submitBtn.innerHTML;
+            
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Vytváří se...';
+            submitBtn.disabled = true;
+
+            setTimeout(() => {
+                // Success feedback
+                submitBtn.innerHTML = '<i class="fas fa-check"></i> Vytvořeno!';
+                submitBtn.style.background = 'var(--success-green)';
+                
+                setTimeout(() => {
+                    closeModal('newReservationModal');
+                    e.target.reset();
+                    submitBtn.innerHTML = originalText;
+                    submitBtn.style.background = '';
+                    submitBtn.disabled = false;
+                    
+                    // Show success notification
+                    showNotification('Rezervace byla úspěšně vytvořena!', 'success');
+                }, 1500);
+            }, 2000);
+
+            console.log('New reservation:', reservationData);
+        });
+
+        // Price calculation for new reservation
+        const checkInInput = document.getElementById('checkIn');
+        const checkOutInput = document.getElementById('checkOut');
+        const roomTypeSelect = document.getElementById('roomType');
+        const totalPriceInput = document.getElementById('totalPrice');
+
+        function calculatePrice() {
+            const checkIn = new Date(checkInInput.value);
+            const checkOut = new Date(checkOutInput.value);
+            const roomType = roomTypeSelect.value;
+
+            if (checkIn && checkOut && roomType && checkOut > checkIn) {
+                const nights = Math.ceil((checkOut - checkIn) / (1000 * 60 * 60 * 24));
+                
+                const roomPrices = {
+                    'luxury': 1500,
+                    'standard': 1200,
+                    'vip': 2000
+                };
+
+                const basePrice = nights * (roomPrices[roomType] || 0);
+                const totalWithTax = Math.round(basePrice * 1.21); // 21% DPH
+
+                totalPriceInput.value = totalWithTax;
+                totalPriceInput.style.color = 'var(--success-green)';
+                totalPriceInput.style.fontWeight = '600';
+            } else {
+                totalPriceInput.value = '';
+            }
+        }
+
+        checkInInput.addEventListener('change', calculatePrice);
+        checkOutInput.addEventListener('change', calculatePrice);
+        roomTypeSelect.addEventListener('change', calculatePrice);
+
+        // Action button handlers
+        document.querySelectorAll('.action-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                e.preventDefault();
+                const action = btn.classList.contains('view') ? 'view' : 
+                              btn.classList.contains('edit') ? 'edit' : 
+                              btn.classList.contains('delete') ? 'delete' : 'other';
+
+                const row = btn.closest('tr');
+                const reservationId = row?.querySelector('td strong')?.textContent;
+
+                switch(action) {
+                    case 'view':
+                        console.log('Viewing reservation:', reservationId);
+                        break;
+                    case 'edit':
+                        console.log('Editing reservation:', reservationId);
+                        showNotification('Funkce editace bude brzy dostupná', 'info');
+                        break;
+                    case 'delete':
+                        if (confirm('Opravdu chcete smazat tuto rezervaci?')) {
+                            console.log('Deleting reservation:', reservationId);
+                            showNotification('Rezervace byla smazána', 'warning');
+                            row.style.animation = 'fadeOut 0.5s ease';
+                            setTimeout(() => row.remove(), 500);
+                        }
+                        break;
+                }
+            });
+        });
+
+        // Notification system
+        function showNotification(message, type = 'info') {
+            const notification = document.createElement('div');
+            notification.style.cssText = `
+                position: fixed;
+                top: 20px;
+                right: 20px;
+                background: var(--glass-bg);
+                backdrop-filter: blur(20px);
+                border: 1px solid var(--glass-border);
+                border-radius: 15px;
+                padding: 15px 20px;
+                color: var(--text-dark);
+                z-index: 3000;
+                transform: translateX(100%);
+                transition: transform 0.3s ease;
+                max-width: 350px;
+                box-shadow: var(--luxury-shadow);
+            `;
+
+            const colors = {
+                success: 'var(--success-green)',
+                error: 'var(--error-red)',
+                warning: 'var(--warning-orange)',
+                info: 'var(--info-blue)'
+            };
+
+            notification.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 10px;">
+                    <i class="fas fa-${type === 'success' ? 'check-circle' : 
+                                      type === 'error' ? 'exclamation-circle' :
+                                      type === 'warning' ? 'exclamation-triangle' : 'info-circle'}" 
+                       style="color: ${colors[type]};"></i>
+                    <span>${message}</span>
+                    <button onclick="this.parentElement.parentElement.remove()" 
+                            style="background: none; border: none; color: var(--text-light); cursor: pointer; margin-left: auto;">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+            `;
+
+            document.body.appendChild(notification);
+
+            setTimeout(() => {
+                notification.style.transform = 'translateX(0)';
+            }, 100);
+
+            setTimeout(() => {
+                notification.style.transform = 'translateX(100%)';
+                setTimeout(() => notification.remove(), 300);
+            }, 4000);
+        }
+
+        // Filter functionality
+        document.querySelectorAll('.filter-select').forEach(select => {
+            select.addEventListener('change', (e) => {
+                const filterValue = e.target.value.toLowerCase();
+                const table = e.target.closest('.data-section').querySelector('.data-table tbody');
+                
+                if (table && filterValue) {
+                    const rows = table.querySelectorAll('tr');
+                    rows.forEach(row => {
+                        const shouldShow = filterValue === '' || 
+                                         row.textContent.toLowerCase().includes(filterValue);
+                        row.style.display = shouldShow ? '' : 'none';
+                    });
+                }
+            });
+        });
+
+        // Real-time stats updates (simulation)
+        function updateStats() {
+            const statValues = document.querySelectorAll('.stat-value');
+            const changes = document.querySelectorAll('.stat-change');
+            
+            statValues.forEach((stat, index) => {
+                // Simulate small random changes
+                const currentValue = stat.textContent;
+                if (currentValue.includes('Kč')) {
+                    const numValue = parseInt(currentValue.replace(/[^\d]/g, ''));
+                    const change = Math.floor(Math.random() * 1000) - 500;
+                    stat.textContent = (numValue + change).toLocaleString('cs-CZ') + ' Kč';
+                } else if (currentValue.includes('%')) {
+                    const numValue = parseInt(currentValue);
+                    const change = Math.floor(Math.random() * 3) - 1;
+                    stat.textContent = Math.max(0, Math.min(100, numValue + change)) + '%';
+                } else {
+                    const numValue = parseInt(currentValue);
+                    const change = Math.floor(Math.random() * 3) - 1;
+                    stat.textContent = Math.max(0, numValue + change);
+                }
+            });
+        }
+
+        // Update stats every 30 seconds (for demo)
+        setInterval(updateStats, 30000);
+
+        // Keyboard shortcuts
+        document.addEventListener('keydown', (e) => {
+            if (e.ctrlKey) {
+                switch(e.key) {
+                    case 'n':
+                        e.preventDefault();
+                        openModal('newReservationModal');
+                        break;
+                    case 'f':
+                        e.preventDefault();
+                        document.querySelector('.search-input').focus();
+                        break;
+                    case 'h':
+                        e.preventDefault();
+                        sidebarToggle.click();
+                        break;
+                }
+            }
+            
+            if (e.key === 'Escape') {
+                document.querySelectorAll('.modal.show').forEach(modal => {
+                    modal.classList.remove('show');
+                    document.body.style.overflow = '';
+                });
+            }
+        });
+
+        // Auto-hide sidebar on small screens
+        function handleResize() {
+            if (window.innerWidth <= 1024) {
+                sidebar.classList.add('collapsed');
+                mainContent.classList.add('expanded');
+            } else {
+                sidebar.classList.remove('collapsed');
+                mainContent.classList.remove('expanded');
+            }
+        }
+
+        window.addEventListener('resize', handleResize);
+        handleResize(); // Initial check
+
+        // Table sorting functionality
+        document.querySelectorAll('.data-table th').forEach(header => {
+            header.style.cursor = 'pointer';
+            header.addEventListener('click', () => {
+                const table = header.closest('table');
+                const tbody = table.querySelector('tbody');
+                const rows = Array.from(tbody.querySelectorAll('tr'));
+                const columnIndex = Array.from(header.parentNode.children).indexOf(header);
+                
+                const isAscending = header.classList.contains('sort-asc');
+                
+                // Remove all sort classes
+                table.querySelectorAll('th').forEach(th => {
+                    th.classList.remove('sort-asc', 'sort-desc');
+                });
+                
+                // Add appropriate sort class
+                header.classList.add(isAscending ? 'sort-desc' : 'sort-asc');
+                
+                rows.sort((a, b) => {
+                    const aText = a.children[columnIndex].textContent.trim();
+                    const bText = b.children[columnIndex].textContent.trim();
+                    
+                    const aNum = parseFloat(aText.replace(/[^\d.-]/g, ''));
+                    const bNum = parseFloat(bText.replace(/[^\d.-]/g, ''));
+                    
+                    if (!isNaN(aNum) && !isNaN(bNum)) {
+                        return isAscending ? bNum - aNum : aNum - bNum;
+                    } else {
+                        return isAscending ? bText.localeCompare(aText) : aText.localeCompare(bText);
+                    }
+                });
+                
+                rows.forEach(row => tbody.appendChild(row));
+            });
+        });
+
+        // Enhanced date validation for new reservation form
+        checkInInput.addEventListener('change', (e) => {
+            const selectedDate = new Date(e.target.value);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            
+            if (selectedDate < today) {
+                e.target.style.borderColor = 'var(--error-red)';
+                showNotification('Datum příjezdu nemůže být v minulosti', 'error');
+                e.target.value = '';
+            } else {
+                e.target.style.borderColor = 'var(--glass-border)';
+                
+                // Set minimum checkout date
+                const minCheckout = new Date(selectedDate);
+                minCheckout.setDate(minCheckout.getDate() + 1);
+                checkOutInput.min = minCheckout.toISOString().split('T')[0];
+                
+                if (checkOutInput.value && new Date(checkOutInput.value) <= selectedDate) {
+                    checkOutInput.value = minCheckout.toISOString().split('T')[0];
+                }
+            }
+        });
+
+        // Initialize page
+        document.addEventListener('DOMContentLoaded', () => {
+            // Set today as minimum date for date inputs
+            const today = new Date().toISOString().split('T')[0];
+            checkInInput.min = today;
+            checkOutInput.min = today;
+            
+            // Load initial data (simulation)
+            setTimeout(() => {
+                showNotification('Admin panel je připraven', 'success');
+            }, 1000);
+        });
+
+        // Export functionality simulation
+        document.querySelectorAll('.btn-secondary').forEach(btn => {
+            if (btn.textContent.includes('Export')) {
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const originalText = btn.innerHTML;
+                    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Exportuje se...';
+                    btn.disabled = true;
+                    
+                    setTimeout(() => {
+                        btn.innerHTML = '<i class="fas fa-check"></i> Staženo!';
+                        setTimeout(() => {
+                            btn.innerHTML = originalText;
+                            btn.disabled = false;
+                        }, 2000);
+                        showNotification('Export byl úspěšně stažen', 'success');
+                    }, 2000);
+                });
+            }
+        });
+
+        // CSS animation for fadeOut
+        const style = document.createElement('style');
+        style.textContent = `
+            @keyframes fadeOut {
+                from { opacity: 1; transform: translateX(0); }
+                to { opacity: 0; transform: translateX(-20px); }
+            }
+            
+            .sort-asc::after {
+                content: ' ↑';
+                color: var(--primary-gold);
+            }
+            
+            .sort-desc::after {
+                content: ' ↓';
+                color: var(--primary-gold);
+            }
+        `;
+        document.head.appendChild(style);
+    </script>
+</body>
+</html>

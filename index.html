@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aurelia Residences - Luxury Living Redefined</title>
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Scroll Progress -->
+    <div class="scroll-progress" id="scrollProgress"></div>
+
+    <!-- Custom Cursor -->
+    <div class="cursor" id="cursor"></div>
+    <div class="cursor-follower" id="cursorFollower"></div>
+
+    <!-- Navigation -->
+    <nav class="navbar" id="navbar">
+        <div class="nav-container">
+            <a href="#" class="logo">Ubytování u Moravců</a>
+            <ul class="nav-links">
+                <li><a href="#home">Domů</a></li>
+                <li><a href="#overview">Přehled</a></li>
+                <li><a href="#gallery">Galerie</a></li>
+                <li><a href="#reviews">Recenze</a></li>
+                <li><a href="#contact">Kontakt</a></li>
+            </ul>
+
+            <div class="hamburger" id="hamburger">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+        </div>
+    </nav>
+
+    <div class="mobile-overlay" id="mobileOverlay"></div>
+
+<!-- Mobile Menu -->
+<div class="mobile-menu" id="mobileMenu">
+    <ul>
+        <li><a href="#home" onclick="closeMobileMenu()">Domů</a></li>
+        <li><a href="#overview" onclick="closeMobileMenu()">Přehled</a></li>
+        <li><a href="#gallery" onclick="closeMobileMenu()">Galerie</a></li>
+        <li><a href="#reviews" onclick="closeMobileMenu()">Recenze</a></li>
+        <li><a href="#contact" onclick="closeMobileMenu()">Kontakt</a></li>
+    </ul>
+
+    <div class="mobile-social">
+        <h4>Sledujte nás</h4>
+        <div class="mobile-social-links">
+            <a href="#"><i class="fab fa-facebook-f"></i></a>
+            <a href="#"><i class="fab fa-instagram"></i></a>
+            <a href="#"><i class="fab fa-twitter"></i></a>
+            <a href="#"><i class="fab fa-linkedin-in"></i></a>
+        </div>
+    </div>
+</div>
+</div>
+
+<!-- Úvodní sekce -->
+<section id="home" class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-content">
+        <h1>Ubytování u Moravců</h1>
+        <p class="hero-subtitle">Kde se luxus setkává s pohodlím v srdci města</p>
+        <a href="reservation.html" class="cta-button">Rezervovat nyní</a>
+    </div>
+    <div class="scroll-indicator" onclick="scrollToSection('overview')">
+        <i class="fas fa-chevron-down"></i>
+    </div>
+</section>
+
+
+    <!-- Overview Section -->
+   <section id="overview" class="overview">
+    <div class="container">
+        <div class="section-title">
+            <h2>Přepište si luxus</h2>
+            <p class="section-subtitle">Zažijte bezkonkurenční eleganci v pečlivě navrženém apartmánu, kde každý detail vyzařuje sofistikovanost a pohodlí.</p>
+        </div>
+
+        <div class="overview-grid">
+            <div class="overview-text">
+                <h3>Vaše městská oáza</h3>
+                <p>Objevte svět vytříbeného bydlení v našem exkluzivním apartmánu s panoramatickým výhledem na město, designovým nábytkem a nejmodernějším vybavením. Každý kout byl promyšlen tak, aby poskytoval výjimečný zážitek z bydlení.</p>
+                <p>Nachází se v prestižní části centra města, s okamžitým přístupem k prvotřídní gastronomii, luxusním obchodům a kulturním památkám – a zároveň vám poskytne klidné útočiště pro odpočinek.</p>
+            </div>
+            <div class="overview-visual">
+                <div class="overview-image">
+                    Ohromující interiérový design
+                </div>
+            </div>
+        </div>
+
+        <div class="features-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-tv"></i>
+                </div>
+                <h4>Chytrá zábava</h4>
+                <p>75" OLED Smart TV s prémiovými streamovacími službami a prostorovým ozvučením</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-water"></i>
+                </div>
+                <h4>Výhled na oceán</h4>
+                <p>Úchvatný 180° výhled na oceán díky oknům od podlahy ke stropu</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-hot-tub"></i>
+                </div>
+                <h4>Soukromá sauna</h4>
+                <p>Osobní finská sauna s chromoterapií a aromaterapií</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-utensils"></i>
+                </div>
+                <h4>Designová kuchyně</h4>
+                <p>Gurmánská kuchyně s prémiovými spotřebiči, vinotékou a mramorovou pracovní deskou</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-dumbbell"></i>
+                </div>
+                <h4>Soukromá posilovna</h4>
+                <p>Kompletně vybavená domácí posilovna s kolem Peloton a špičkovým vybavením</p>
+            </div>
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-concierge-bell"></i>
+                </div>
+                <h4>Recepce 24/7</h4>
+                <p>Dedikovaný concierge servis pro rezervace restaurací a místní zážitky</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+    <!-- Gallery Section -->
+    <section id="gallery" class="gallery">
+        <div class="container">
+    <div class="section-title">
+        <h2 style="color: white;">Vizuální prohlídka</h2>
+        <p class="section-subtitle" style="color: rgba(255,255,255,0.8);">Ponořte se do krásy a elegance rezidence Aurelia</p>
+    </div>
+</div>
+
+        
+        <div class="gallery-slider">
+            <div class="gallery-item">Living Room - Day</div>
+            <div class="gallery-item">Ocean View Terrace</div>
+            <div class="gallery-item">Master Bedroom</div>
+            <div class="gallery-item">Designer Kitchen</div>
+            <div class="gallery-item">Private Sauna</div>
+            <div class="gallery-item">Sunset Views</div>
+            <div class="gallery-item">Bathroom Spa</div>
+            <div class="gallery-item">City Skyline</div>
+            <!-- Duplicate for infinite scroll -->
+            <div class="gallery-item">Living Room - Day</div>
+            <div class="gallery-item">Ocean View Terrace</div>
+            <div class="gallery-item">Master Bedroom</div>
+            <div class="gallery-item">Designer Kitchen</div>
+            <div class="gallery-item">Private Sauna</div>
+            <div class="gallery-item">Sunset Views</div>
+            <div class="gallery-item">Bathroom Spa</div>
+            <div class="gallery-item">City Skyline</div>
+        </div>
+    </section>
+
+    <!-- Reviews Section -->
+   <section id="reviews" class="reviews">
+    <div class="container">
+        <div class="section-title">
+            <h2>Zkušenosti hostů</h2>
+            <p class="section-subtitle">Zjistěte, co o svém pobytu říkají naši vážení hosté</p>
+        </div>
+
+        <div class="reviews-slider">
+            <div class="review-card">
+                <div class="verified-badge">
+                    <i class="fab fa-airbnb"></i> Ověřeno
+                </div>
+                <div class="reviewer-info">
+                    <div class="reviewer-avatar">S</div>
+                    <div class="reviewer-details">
+                        <h5>Sophia Chen</h5>
+                        <div class="reviewer-location">New York, USA</div>
+                    </div>
+                </div>
+                <div class="stars">★★★★★</div>
+                <p class="review-text">"Naprostá nádhera! Výhled na oceán je hypnotizující a každý detail tohoto apartmánu vyzařuje luxus. Soukromá sauna byla třešničkou na dortu. Nemůžu se dočkat, až se vrátím!"</p>
+            </div>
+
+            <div class="review-card">
+                <div class="verified-badge">
+                    <i class="fab fa-google"></i> Ověřeno
+                </div>
+                <div class="reviewer-info">
+                    <div class="reviewer-avatar">M</div>
+                    <div class="reviewer-details">
+                        <h5>Marcus Rodriguez</h5>
+                        <div class="reviewer-location">Barcelona, Španělsko</div>
+                    </div>
+                </div>
+                <div class="stars">★★★★★</div>
+                <p class="review-text">"Ztělesnění sofistikovanosti. Od první chvíle jsem se cítil jako král. Chytré funkce a concierge servis udělaly z mé pracovní cesty naprosto bezproblémový zážitek."</p>
+            </div>
+
+            <div class="review-card">
+                <div class="verified-badge">
+                    <i class="fab fa-airbnb"></i> Ověřeno
+                </div>
+                <div class="reviewer-info">
+                    <div class="reviewer-avatar">E</div>
+                    <div class="reviewer-details">
+                        <h5>Emma Thompson</h5>
+                        <div class="reviewer-location">Londýn, Velká Británie</div>
+                    </div>
+                </div>
+                <div class="stars">★★★★★</div>
+                <p class="review-text">"Slovy nelze vyjádřit krásu tohoto místa. Designová kuchyně je snem každého kuchaře a sledování východu slunce z terasy byl naprosto kouzelný zážitek. Skvělá pohostinnost!"</p>
+            </div>
+
+            <div class="review-card">
+                <div class="verified-badge">
+                    <i class="fab fa-google"></i> Ověřeno
+                </div>
+                <div class="reviewer-info">
+                    <div class="reviewer-avatar">D</div>
+                    <div class="reviewer-details">
+                        <h5>David Kim</h5>
+                        <div class="reviewer-location">Tokio, Japonsko</div>
+                    </div>
+                </div>
+                <div class="stars">★★★★★</div>
+                <p class="review-text">"Opravdový domov daleko od domova, povýšený na nevídanou úroveň luxusu. Důraz na detail a osobní přístup předčily všechna očekávání. Naprosto úžasné!"</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+    <!-- Contact Section -->
+    <section id="contact" class="contact">
+    <div class="container">
+        <div class="section-title">
+            <h2>Kontaktujte nás</h2>
+            <p class="section-subtitle">Připraveni zažít luxusní bydlení? Jsme tu, abychom z vašeho pobytu udělali výjimečný zážitek</p>
+        </div>
+
+        <div class="contact-grid">
+            <div class="contact-form">
+                <form id="contactForm">
+                    <div class="form-group">
+                        <input type="text" class="form-input" placeholder=" " required>
+                        <label class="form-label">Celé jméno</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="email" class="form-input" placeholder=" " required>
+                        <label class="form-label">Emailová adresa</label>
+                    </div>
+                    <div class="form-group">
+                        <input type="tel" class="form-input" placeholder=" ">
+                        <label class="form-label">Telefonní číslo</label>
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-input" rows="5" placeholder=" " required></textarea>
+                        <label class="form-label">Zpráva</label>
+                    </div>
+                    <button type="submit" class="cta-button" style="width: 100%;">Odeslat zprávu</button>
+                </form>
+            </div>
+
+            <div class="contact-info">
+                <h3>Kontaktní informace</h3>
+
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fas fa-map-marker-alt"></i>
+                    </div>
+                    <div>
+                        <h4>Adresa</h4>
+                        <p>1 Luxury Boulevard, Oceanfront District<br>Premium City, PC 12345</p>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fas fa-phone"></i>
+                    </div>
+                    <div>
+                        <h4>Telefon</h4>
+                        <p>+1 (555) LUXURY-1<br>Dostupné 24/7</p>
+                    </div>
+                </div>
+
+                <div class="contact-item">
+                    <div class="contact-icon">
+                        <i class="fas fa-envelope"></i>
+                    </div>
+                    <div>
+                        <h4>Email</h4>
+                        <p>concierge@aurelia.luxury<br>reservations@aurelia.luxury</p>
+                    </div>
+                </div>
+
+                <div style="margin-top: 40px; padding: 30px; background: var(--glass-bg); backdrop-filter: blur(20px); border-radius: 20px; border: 1px solid var(--glass-border);">
+                    <h4 style="color: var(--primary-navy); margin-bottom: 15px;">Mapa umístění</h4>
+                    <div style="width: 100%; height: 200px; background: linear-gradient(135deg, #4a5568, #2d3748); border-radius: 15px; display: flex; align-items: center; justify-content: center; color: rgba(255,255,255,0.7);">
+                        <i class="fas fa-map-marked-alt" style="font-size: 2rem; margin-right: 15px;"></i>
+                        Interaktivní mapa umístění
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+<!-- Footer -->
+    <footer class="footer">
+        <div class="footer-overlay"></div>
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-main">
+                    <div class="footer-brand">
+                        <h3 class="footer-logo">Ubytování u Moravců</h3>
+                        <p class="footer-tagline">Kde se luxus setkává s pohodlím</p>
+                        <div class="footer-social">
+                            <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-instagram"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-twitter"></i></a>
+                            <a href="#" class="social-link"><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+
+                    <div class="footer-links">
+                        <div class="footer-column">
+                            <h4>Rychlé odkazy</h4>
+                            <ul>
+                                <li><a href="#home">Domů</a></li>
+                                <li><a href="#overview">Přehled</a></li>
+                                <li><a href="#gallery">Galerie</a></li>
+                                <li><a href="#reviews">Recenze</a></li>
+                                <li><a href="#contact">Kontakt</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="footer-column">
+                            <h4>Služby</h4>
+                            <ul>
+                                <li><a href="#">Concierge 24/7</a></li>
+                                <li><a href="#">Transfer z letiště</a></li>
+                                <li><a href="#">Rezervace restaurací</a></li>
+                                <li><a href="#">Lázeňské služby</a></li>
+                                <li><a href="#">Osobní trenér</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="footer-column">
+                            <h4>Informace</h4>
+                            <ul>
+                                <li><a href="#">Podmínky pobytu</a></li>
+                                <li><a href="#">Zásady ochrany osobních údajů</a></li>
+                                <li><a href="#">Rezervační podmínky</a></li>
+                                <li><a href="#">Často kladené otázky</a></li>
+                                <li><a href="#">Kariéra</a></li>
+                            </ul>
+                        </div>
+
+                        <div class="footer-column">
+                            <h4>Kontakt</h4>
+                            <div class="footer-contact-item">
+                                <i class="fas fa-map-marker-alt"></i>
+                                <span>Prestižní centrum města<br>Luxury District</span>
+                            </div>
+                            <div class="footer-contact-item">
+                                <i class="fas fa-phone"></i>
+                                <span>+420 123 456 789</span>
+                            </div>
+                            <div class="footer-contact-item">
+                                <i class="fas fa-envelope"></i>
+                                <span>info@moravci.luxury</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="footer-newsletter">
+                    <div class="newsletter-content">
+                        <div class="newsletter-text">
+                            <h4>Zůstaňte v kontaktu</h4>
+                            <p>Přihlaste se k odběru exkluzivních nabídek a novinek</p>
+                        </div>
+                        <form class="newsletter-form">
+                            <input type="email" placeholder="Váš email" class="newsletter-input">
+                            <button type="submit" class="newsletter-btn">
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+
+                <div class="footer-bottom">
+                    <div class="footer-divider"></div>
+                    <div class="footer-bottom-content">
+                        <p>&copy; 2025 Ubytování u Moravců. Všechna práva vyhrazena.</p>
+                        <div class="footer-certifications">
+                            <span class="cert-badge"><i class="fas fa-award"></i> 5★ Luxury</span>
+                            <span class="cert-badge"><i class="fas fa-shield-alt"></i> Verified</span>
+                            <span class="cert-badge"><i class="fas fa-leaf"></i> Eco-Friendly</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <script src="script.js"></script>
+</body>
+</html>
