@@ -3,174 +3,151 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Rezervace - Ubytování u Moravců</title>
+    <title>Údaje k rezervaci - Ubytování u Moravců</title>
     <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-container">
-            <a href="/" class="logo">Ubytování u Moravců</a>
-            <a href="/" class="back-btn">
-                <i class="fas fa-arrow-left"></i>
-                Zpět na hlavní stránku
-            </a>
-        </div>
-    </header>
+<!-- Header -->
+<header class="header">
+    <div class="header-container">
+        <a href="/" class="logo">Ubytování u Moravců</a>
+        <a href="../appointment.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Zpět na výběr termínu
+        </a>
+    </div>
+</header>
 
-    <div class="progress-container">
-        <div class="progress-bar">
-            <div class="progress-step completed">1</div>
-            <div class="progress-step active">2</div>
-            <div class="progress-step">3</div>
+<!-- Progress Bar -->
+<div class="progress-container">
+    <div class="progress-bar">
+        <div class="progress-step completed">1</div>
+        <div class="progress-step active">2</div>
+        <div class="progress-step">3</div>
+    </div>
+    <div class="progress-labels">
+        <div class="progress-label">Výběr termínu</div>
+        <div class="progress-label active">Údaje</div>
+        <div class="progress-label">Potvrzení & Platba</div>
+    </div>
+</div>
+
+<!-- Main Container -->
+<div class="main-container">
+    <!-- Page Title -->
+    <div class="page-title">
+        <h1>Údaje k rezervaci</h1>
+        <p>Vyplňte své kontaktní údaje a vyberte doplňkové služby</p>
+    </div>
+
+    <!-- Booking Summary -->
+    <div class="booking-summary">
+        <h2>Souhrn rezervace</h2>
+
+        <div class="summary-section">
+            <h3>Detaily pobytu</h3>
+            <div class="summary-row">
+                <span>Příjezd:</span>
+                <span id="checkInDate">Načítá se...</span>
+            </div>
+            <div class="summary-row">
+                <span>Odjezd:</span>
+                <span id="checkOutDate">Načítá se...</span>
+            </div>
+            <div class="summary-row">
+                <span>Počet nocí:</span>
+                <span id="nightsCount">0</span>
+            </div>
+            <div class="summary-row">
+                <span>Cena za noc:</span>
+                <span>1 500 Kč</span>
+            </div>
         </div>
-        <div class="progress-labels">
-            <div class="progress-label">Výběr termínu</div>
-            <div class="progress-label">Údaje</div>
-            <div class="progress-label">Potvrzení & Platba</div>
+
+        <div class="summary-section">
+            <h3>Celkový rozpis ceny</h3>
+            <div class="summary-row">
+                <span>Ubytování:</span>
+                <span id="basePrice">0 Kč</span>
+            </div>
+            <div class="summary-row" id="extraServicesRow" style="display: none;">
+                <span>Doplňkové služby:</span>
+                <span id="extrasPrice">0 Kč</span>
+            </div>
+            <div class="summary-row total">
+                <span>Celková cena:</span>
+                <span id="totalPrice">0 Kč</span>
+            </div>
         </div>
     </div>
 
-    <!-- Main Container -->
-    <div class="main-container">
-        <!-- Page Title -->
-        <div class="page-title">
-            <h1>Rezervace apartmánu</h1>
-            <p>Vyberte si termín a rezervujte si svůj luxusní pobyt</p>
+    <!-- Reservation Form -->
+    <div class="reservation-form">
+        <div class="form-header">
+            <h2>Kontaktní údaje</h2>
         </div>
 
-        <!-- Calendar Section -->
-        
-
-        <!-- Reservation Form -->
-        <div class="reservation-form">
-            <div class="form-header">
-                <h2>Údaje k rezervaci</h2>
-            </div>
-
-            <div class="booking-summary" id="bookingSummary">
-                <h3>Souhrn rezervace</h3>
-                <div class="summary-row">
-                    <span>Příjezd:</span>
-                    <span id="checkInDate">Nevybráno</span>
+        <form id="reservationForm">
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="firstName">Jméno *</label>
+                    <input type="text" id="firstName" name="firstName" class="form-input" required>
                 </div>
-                <div class="summary-row">
-                    <span>Odjezd:</span>
-                    <span id="checkOutDate">Nevybráno</span>
-                </div>
-                <div class="summary-row">
-                    <span>Počet nocí:</span>
-                    <span id="nightsCount">0</span>
-                </div>
-                <div class="summary-row">
-                    <span>Cena za noc:</span>
-                    <span>1 500 Kč</span>
-                </div>
-                <div class="summary-row total">
-                    <span>Celková cena:</span>
-                    <span id="totalPrice">0 Kč</span>
+                <div class="form-group">
+                    <label for="lastName">Příjmení *</label>
+                    <input type="text" id="lastName" name="lastName" class="form-input" required>
                 </div>
             </div>
 
-            <form id="reservationForm">
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="firstName">Jméno *</label>
-                        <input type="text" id="firstName" name="firstName" class="form-input" required>
-                    </div>
-                    <div class="form-group">
-                        <label for="lastName">Příjmení *</label>
-                        <input type="text" id="lastName" name="lastName" class="form-input" required>
-                    </div>
-                </div>
+            <div class="form-group">
+                <label for="email">Email *</label>
+                <input type="email" id="email" name="email" class="form-input" required>
+            </div>
 
+            <div class="form-group">
+                <label for="phone">Telefon *</label>
+                <input type="tel" id="phone" name="phone" class="form-input" required>
+            </div>
+
+            <div class="form-row">
                 <div class="form-group">
-                    <label for="email">Email *</label>
-                    <input type="email" id="email" name="email" class="form-input" required>
+                    <label for="guests">Počet hostů *</label>
+                    <select id="guests" name="guests" class="form-select" required>
+                        <option value="">Vyberte počet</option>
+                        <option value="1">1 host</option>
+                        <option value="2">2 hosté</option>
+                        <option value="3">3 hosté</option>
+                        <option value="4">4 hosté</option>
+                    </select>
                 </div>
-
                 <div class="form-group">
-                    <label for="phone">Telefon *</label>
-                    <input type="tel" id="phone" name="phone" class="form-input" required>
+                    <label for="purpose">Účel pobytu</label>
+                    <select id="purpose" name="purpose" class="form-select">
+                        <option value="">Vyberte účel</option>
+                        <option value="vacation">Dovolená</option>
+                        <option value="business">Služební cesta</option>
+                        <option value="romantic">Romantický pobyt</option>
+                        <option value="family">Rodinná návštěva</option>
+                        <option value="other">Jiné</option>
+                    </select>
                 </div>
+            </div>
 
-                <div class="form-row">
-                    <div class="form-group">
-                        <label for="guests">Počet hostů *</label>
-                        <select id="guests" name="guests" class="form-select" required>
-                            <option value="">Vyberte počet</option>
-                            <option value="1">1 host</option>
-                            <option value="2">2 hosté</option>
-                            <option value="3">3 hosté</option>
-                            <option value="4">4 hosté</option>
-                        </select>
-                    </div>
-                    <div class="form-group">
-                        <label for="purpose">Účel pobytu</label>
-                        <select id="purpose" name="purpose" class="form-select">
-                            <option value="">Vyberte účel</option>
-                            <option value="vacation">Dovolená</option>
-                            <option value="business">Služební cesta</option>
-                            <option value="romantic">Romantický pobyt</option>
-                            <option value="family">Rodinná návštěva</option>
-                            <option value="other">Jiné</option>
-                        </select>
-                    </div>
-                </div>
+            <div class="form-group">
+                <label for="notes">Speciální požadavky</label>
+                <textarea id="notes" name="notes" class="form-textarea" placeholder="Máte nějaké speciální požadavky nebo přání?"></textarea>
+            </div>
 
-                <div class="extras-section">
-                    <h3>Doplňkové služby</h3>
-                    <div class="extra-item">
-                        <div class="extra-info">
-                            <h4>Transfer z letiště</h4>
-                            <p>Luxusní transfer Mercedes-Benz</p>
-                        </div>
-                        <div class="extra-price">+800 Kč</div>
-                        <input type="checkbox" id="airport" name="extras" value="airport" class="extra-checkbox">
-                    </div>
-                    <div class="extra-item">
-                        <div class="extra-info">
-                            <h4>Lázeňské balíčky</h4>
-                            <p>Relaxační masáže a wellness</p>
-                        </div>
-                        <div class="extra-price">+1200 Kč</div>
-                        <input type="checkbox" id="spa" name="extras" value="spa" class="extra-checkbox">
-                    </div>
-                    <div class="extra-item">
-                        <div class="extra-info">
-                            <h4>Romantická večeře</h4>
-                            <p>Soukromá večeře při svíčkách</p>
-                        </div>
-                        <div class="extra-price">+2500 Kč</div>
-                        <input type="checkbox" id="dinner" name="extras" value="dinner" class="extra-checkbox">
-                    </div>
-                    <div class="extra-item">
-                        <div class="extra-info">
-                            <h4>Osobní concierge</h4>
-                            <p>24/7 osobní asistent</p>
-                        </div>
-                        <div class="extra-price">+600 Kč/den</div>
-                        <input type="checkbox" id="concierge" name="extras" value="concierge" class="extra-checkbox">
-                    </div>
-                </div>
-
-                <div class="form-group">
-                    <label for="notes">Speciální požadavky</label>
-                    <textarea id="notes" name="notes" class="form-textarea" placeholder="Máte nějaké speciální požadavky nebo přání?"></textarea>
-                </div>
-
-                <button type="submit" class="submit-btn" id="submitBtn">
-                    <i class="fas fa-calendar-check"></i>
-                    Odeslat rezervaci
-                </button>
-            </form>
-        </div>
+            <button type="submit" class="submit-btn" id="submitBtn">
+                <i class="fas fa-credit-card"></i>
+                Pokračovat k platbě
+            </button>
+        </form>
     </div>
+</div>
 
-    <!-- Success Message -->
-
-    <script src="script.js"></script>
+<script src="script.js"></script>
 </body>
 </html>

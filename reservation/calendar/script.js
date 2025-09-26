@@ -1,61 +1,74 @@
-// Calendar functionality
 class ReservationCalendar {
     constructor() {
         this.currentMonth = new Date().getMonth();
         this.currentYear = new Date().getFullYear();
         this.selectedDates = [];
-        this.unavailableDates = [
-            '2025-08-15', '2025-08-16', '2025-08-17',
-            '2025-08-22', '2025-08-23',
-            '2025-09-05', '2025-09-06', '2025-09-07'
-        ];
-        this.pricePerNight = 1500;
-        this.extraPrices = {
-            airport: 800,
-            spa: 1200,
-            dinner: 2500,
-            concierge: 600
-        };
+        this.unavailableDates = []; // will be loaded from API
 
         this.init();
     }
 
-    init() {
+    async init() {
+        await this.fetchReservations(); // fetch unavailable dates first
         this.generateCalendar();
         this.addEventListeners();
-        this.updateBookingSummary();
+        this.updateSummary();
+    }
+
+    async fetchReservations() {
+        try {
+            const response = await fetch(
+                `https://mymedevelopers.com/ReserveApi/reservation/monthlyReservations.php?year=${this.currentYear}&month=${this.currentMonth + 1}`
+            );
+
+            const data = await response.json();
+
+            if (data.success && data.data && data.data.reservations) {
+                const reservations = data.data.reservations;
+                const blocked = [];
+
+                reservations.forEach(res => {
+                    const checkIn = new Date(res.check_in);
+                    const checkOut = new Date(res.check_out);
+
+                    // Loop through all days between check_in and check_out
+                    let current = new Date(checkIn);
+                    while (current < checkOut) {
+                        blocked.push(this.formatDate(current));
+                        current.setDate(current.getDate() + 1);
+                    }
+                });
+
+                this.unavailableDates = blocked;
+            } else {
+                console.warn("No reservations found or invalid API response.");
+                this.unavailableDates = [];
+            }
+        } catch (error) {
+            console.error("Error fetching reservations:", error);
+            this.unavailableDates = [];
+        }
     }
 
     addEventListeners() {
-        document.getElementById('prevMonth').addEventListener('click', () => {
+        document.getElementById('prevMonth').addEventListener('click', async () => {
             this.currentMonth--;
             if (this.currentMonth < 0) {
                 this.currentMonth = 11;
                 this.currentYear--;
             }
+            await this.fetchReservations();
             this.generateCalendar();
         });
 
-        document.getElementById('nextMonth').addEventListener('click', () => {
+        document.getElementById('nextMonth').addEventListener('click', async () => {
             this.currentMonth++;
             if (this.currentMonth > 11) {
                 this.currentMonth = 0;
                 this.currentYear++;
             }
+            await this.fetchReservations();
             this.generateCalendar();
-        });
-
-        // Form submission
-        document.getElementById('reservationForm').addEventListener('submit', (e) => {
-            e.preventDefault();
-            this.handleFormSubmission();
-        });
-
-        // Extra services
-        document.querySelectorAll('input[name="extras"]').forEach(checkbox => {
-            checkbox.addEventListener('change', () => {
-                this.updateBookingSummary();
-            });
         });
     }
 
@@ -86,6 +99,9 @@ class ReservationCalendar {
             calendarGrid.appendChild(dayHeader);
         });
 
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
         // Generate calendar days
         for (let i = 0; i < 42; i++) {
             const currentDate = new Date(startDate);
@@ -96,12 +112,11 @@ class ReservationCalendar {
             dayElement.textContent = currentDate.getDate();
 
             const dateString = this.formatDate(currentDate);
-            const today = new Date();
 
             // Add classes based on date status
             if (currentDate.getMonth() !== this.currentMonth) {
                 dayElement.classList.add('other-month');
-            } else if (currentDate < today.setHours(0, 0, 0, 0)) {
+            } else if (currentDate < today) {
                 dayElement.classList.add('unavailable');
             } else if (this.unavailableDates.includes(dateString)) {
                 dayElement.classList.add('unavailable');
@@ -115,14 +130,7 @@ class ReservationCalendar {
                 dayElement.classList.add('today');
             }
 
-            // Add price indicator
-            if (currentDate.getMonth() === this.currentMonth &&
-                currentDate >= today.setHours(0, 0, 0, 0) &&
-                !this.unavailableDates.includes(dateString)) {
-                dayElement.setAttribute('data-price', '1500');
-            }
-
-            // Add click event
+            // Add click event for available days
             if (!dayElement.classList.contains('unavailable') &&
                 !dayElement.classList.contains('other-month')) {
                 dayElement.addEventListener('click', () => {
@@ -168,150 +176,81 @@ class ReservationCalendar {
         }
 
         this.generateCalendar();
-        this.updateBookingSummary();
+        this.updateSummary();
     }
 
-    updateBookingSummary() {
-        const checkInElement = document.getElementById('checkInDate');
-        const checkOutElement = document.getElementById('checkOutDate');
-        const nightsElement = document.getElementById('nightsCount');
-        const totalPriceElement = document.getElementById('totalPrice');
+    updateSummary() {
+        const summarySection = document.getElementById('selectionSummary');
+        const continueBtn = document.getElementById('continueBtn');
+        const checkInDisplay = document.getElementById('checkInDisplay');
+        const checkOutDisplay = document.getElementById('checkOutDisplay');
+        const nightsDisplay = document.getElementById('nightsDisplay');
 
         if (this.selectedDates.length >= 1) {
             const checkIn = new Date(this.selectedDates[0]);
-            checkInElement.textContent = checkIn.toLocaleDateString('cs-CZ');
+            checkInDisplay.textContent = checkIn.toLocaleDateString('cs-CZ', {
+                weekday: 'short',
+                day: 'numeric',
+                month: 'short'
+            });
         } else {
-            checkInElement.textContent = 'Nevybráno';
+            checkInDisplay.textContent = '-';
         }
 
         if (this.selectedDates.length >= 2) {
             const checkOut = new Date(this.selectedDates[1]);
-            checkOutElement.textContent = checkOut.toLocaleDateString('cs-CZ');
-
-            const nights = Math.ceil((checkOut - new Date(this.selectedDates[0])) / (1000 * 60 * 60 * 24));
-            nightsElement.textContent = nights;
-
-            // Calculate total price
-            let totalPrice = nights * this.pricePerNight;
-
-            // Add extra services
-            document.querySelectorAll('input[name="extras"]:checked').forEach(checkbox => {
-                const service = checkbox.value;
-                if (service === 'concierge') {
-                    totalPrice += this.extraPrices[service] * nights;
-                } else {
-                    totalPrice += this.extraPrices[service];
-                }
+            checkOutDisplay.textContent = checkOut.toLocaleDateString('cs-CZ', {
+                weekday: 'short',
+                day: 'numeric',
+                month: 'short'
             });
 
-            totalPriceElement.textContent = `${totalPrice.toLocaleString('cs-CZ')} Kč`;
+            const nights = Math.ceil((checkOut - new Date(this.selectedDates[0])) / (1000 * 60 * 60 * 24));
+            nightsDisplay.textContent = `${nights} ${nights === 1 ? 'noc' : nights <= 4 ? 'noci' : 'nocí'}`;
+
+            summarySection.style.display = 'block';
+            continueBtn.disabled = false;
         } else {
-            checkOutElement.textContent = 'Nevybráno';
-            nightsElement.textContent = '0';
-            totalPriceElement.textContent = '0 Kč';
+            checkOutDisplay.textContent = '-';
+            nightsDisplay.textContent = '0 nocí';
+
+            if (this.selectedDates.length === 0) {
+                summarySection.style.display = 'none';
+            } else {
+                summarySection.style.display = 'block';
+            }
+            continueBtn.disabled = true;
         }
     }
 
-    handleFormSubmission() {
-        // Validate dates
-        if (this.selectedDates.length < 2) {
-            alert('Prosím vyberte termín příjezdu a odjezdu.');
-            return;
-        }
-
-        // Get form data
-        const formData = new FormData(document.getElementById('reservationForm'));
-        const reservationData = {
-            checkIn: this.selectedDates[0],
-            checkOut: this.selectedDates[1],
-            firstName: formData.get('firstName'),
-            lastName: formData.get('lastName'),
-            email: formData.get('email'),
-            phone: formData.get('phone'),
-            guests: formData.get('guests'),
-            purpose: formData.get('purpose'),
-            extras: Array.from(document.querySelectorAll('input[name="extras"]:checked')).map(cb => cb.value),
-            notes: formData.get('notes')
+    getSelectedDates() {
+        return {
+            checkIn: this.selectedDates[0] || null,
+            checkOut: this.selectedDates[1] || null
         };
-
-        // Simulate form submission
-        const submitBtn = document.getElementById('submitBtn');
-        submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Odesílání...';
-        submitBtn.disabled = true;
-
-        setTimeout(() => {
-            this.showSuccessMessage();
-            submitBtn.innerHTML = '<i class="fas fa-calendar-check"></i> Odeslat rezervaci';
-            submitBtn.disabled = false;
-
-            // Reset form
-            document.getElementById('reservationForm').reset();
-            this.selectedDates = [];
-            this.generateCalendar();
-            this.updateBookingSummary();
-        }, 2000);
-
-        console.log('Reservation data:', reservationData);
-    }
-
-    showSuccessMessage() {
-        const successMessage = document.getElementById('successMessage');
-        successMessage.classList.add('show');
-
-        setTimeout(() => {
-            successMessage.classList.remove('show');
-        }, 4000);
     }
 }
 
+// Global variable to access calendar instance
+let calendar;
+
 // Initialize calendar when page loads
 document.addEventListener('DOMContentLoaded', () => {
-    new ReservationCalendar();
+    calendar = new ReservationCalendar();
 });
 
-// Smooth scrolling for any anchor links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth'
-            });
-        }
-    });
-});
+// Continue to form function
+function continueToForm() {
+    const selectedDates = calendar.getSelectedDates();
 
-// Add loading animation to form inputs
-document.querySelectorAll('.form-input, .form-select, .form-textarea').forEach(input => {
-    input.addEventListener('focus', function () {
-        this.parentElement.style.transform = 'translateY(-2px)';
-    });
-
-    input.addEventListener('blur', function () {
-        this.parentElement.style.transform = 'translateY(0)';
-    });
-});
-
-// Enhanced form validation
-document.getElementById('email').addEventListener('blur', function () {
-    const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (this.value && !emailPattern.test(this.value)) {
-        this.style.borderColor = 'var(--error-red)';
-        this.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
-    } else {
-        this.style.borderColor = 'var(--glass-border)';
-        this.style.boxShadow = 'none';
+    if (!selectedDates.checkIn || !selectedDates.checkOut) {
+        alert('Prosím vyberte termín příjezdu a odjezdu.');
+        return;
     }
-});
 
-document.getElementById('phone').addEventListener('blur', function () {
-    const phonePattern = /^[+]?[\d\s\-\(\)]{9,}$/;
-    if (this.value && !phonePattern.test(this.value)) {
-        this.style.borderColor = 'var(--error-red)';
-        this.style.boxShadow = '0 0 0 3px rgba(239, 68, 68, 0.1)';
-    } else {
-        this.style.borderColor = 'var(--glass-border)';
-        this.style.boxShadow = 'none';
-    }
-});
+    // Store selected dates in localStorage
+    localStorage.setItem('reservationDates', JSON.stringify(selectedDates));
+
+    // Navigate to the form page
+    window.location.href = '/reservation/form/data.html';
+}

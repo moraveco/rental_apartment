@@ -4,8 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Rezervace - Ubytování u Moravců</title>
-    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap"
-          rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;600;700&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -21,6 +20,7 @@
     </div>
 </header>
 
+<!-- Progress Bar -->
 <div class="progress-container">
     <div class="progress-bar">
         <div class="progress-step active">1</div>
@@ -28,7 +28,7 @@
         <div class="progress-step">3</div>
     </div>
     <div class="progress-labels">
-        <div class="progress-label">Výběr termínu</div>
+        <div class="progress-label active">Výběr termínu</div>
         <div class="progress-label">Údaje</div>
         <div class="progress-label">Potvrzení & Platba</div>
     </div>
@@ -39,13 +39,13 @@
     <!-- Page Title -->
     <div class="page-title">
         <h1>Rezervace apartmánu</h1>
-        <p>Vyberte si termín a rezervujte si svůj luxusní pobyt</p>
+        <p>Vyberte si termín příjezdu a odjezdu</p>
     </div>
 
     <!-- Calendar Section -->
     <div class="calendar-section">
         <div class="calendar-header">
-            <h2>Vyberte termín</h2>
+            <h2>Vyberte termín pobytu</h2>
             <div class="calendar-nav">
                 <button id="prevMonth"><i class="fas fa-chevron-left"></i></button>
                 <div class="month-year" id="monthYear"></div>
@@ -74,7 +74,35 @@
             </div>
         </div>
     </div>
+
+    <!-- Selection Summary -->
+    <div class="selection-summary" id="selectionSummary" style="display: none;">
+        <h3 class="summary-title">Váš výběr</h3>
+        <div class="summary-content">
+            <div class="summary-item">
+                <div class="summary-label">Příjezd</div>
+                <div class="summary-value" id="checkInDisplay">-</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Odjezd</div>
+                <div class="summary-value" id="checkOutDisplay">-</div>
+            </div>
+            <div class="summary-item">
+                <div class="summary-label">Počet nocí</div>
+                <div class="summary-value" id="nightsDisplay">0</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Continue Section -->
+    <div class="continue-section">
+        <button class="continue-btn" id="continueBtn" disabled onclick="continueToForm()">
+            <i class="fas fa-arrow-right"></i>
+            Pokračovat k údajům
+        </button>
+    </div>
 </div>
+
 <script src="script.js"></script>
 </body>
 </html>

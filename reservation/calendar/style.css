@@ -93,22 +93,103 @@ body::before {
     box-shadow: var(--glow-gold);
 }
 
+/* Progress Bar */
+.progress-container {
+    max-width: 1400px;
+    margin: 40px auto;
+    padding: 0 40px;
+}
+
+.progress-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    position: relative;
+}
+
+.progress-bar::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: rgba(212, 175, 55, 0.2);
+    transform: translateY(-50%);
+    z-index: 1;
+}
+
+.progress-bar::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    width: 33.33%;
+    height: 3px;
+    background: linear-gradient(90deg, var(--primary-gold), var(--accent-copper));
+    transform: translateY(-50%);
+    z-index: 2;
+    transition: width 0.8s ease;
+}
+
+.progress-step {
+    background: white;
+    border: 3px solid rgba(212, 175, 55, 0.2);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    position: relative;
+    z-index: 3;
+    transition: all 0.3s ease;
+}
+
+.progress-step.completed {
+    background: var(--primary-gold);
+    border-color: var(--primary-gold);
+    color: white;
+}
+
+.progress-step.active {
+    background: var(--primary-navy);
+    border-color: var(--primary-navy);
+    color: white;
+    box-shadow: var(--glow-gold);
+}
+
+.progress-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+}
+
+.progress-label {
+    text-align: center;
+    font-size: 0.9rem;
+    color: var(--text-light);
+    font-weight: 500;
+}
+
+.progress-label.active {
+    color: var(--primary-navy);
+    font-weight: 600;
+}
+
 /* Main Container */
 .main-container {
-    max-width: 1400px;
+    max-width: 800px; /* Reduced width for better centering */
     margin: 0 auto;
     padding: 60px 40px;
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 60px;
-    align-items: start;
 }
 
 /* Page Title */
 .page-title {
-    grid-column: 1 / -1;
     text-align: center;
-    margin-bottom: 40px;
+    margin-bottom: 60px;
 }
 
 .page-title h1 {
@@ -136,6 +217,7 @@ body::before {
     box-shadow: var(--luxury-shadow);
     position: relative;
     overflow: hidden;
+    margin-bottom: 40px;
 }
 
 .calendar-section::before {
@@ -311,19 +393,19 @@ body::before {
 .legend-selected { background: var(--primary-gold); }
 .legend-unavailable { background: rgba(239, 68, 68, 0.1); }
 
-/* Reservation Form */
-.reservation-form {
+/* Selection Summary */
+.selection-summary {
     background: var(--glass-bg);
     backdrop-filter: blur(20px);
     border: 1px solid var(--glass-border);
-    border-radius: 25px;
-    padding: 40px;
-    box-shadow: var(--luxury-shadow);
+    border-radius: 20px;
+    padding: 30px;
+    margin-bottom: 30px;
     position: relative;
     overflow: hidden;
 }
 
-.reservation-form::before {
+.selection-summary::before {
     content: '';
     position: absolute;
     top: 0;
@@ -335,159 +417,60 @@ body::before {
     pointer-events: none;
 }
 
-.form-header {
-    text-align: center;
-    margin-bottom: 30px;
-    position: relative;
-    z-index: 2;
-}
-
-.form-header h2 {
+.summary-title {
     font-family: 'Playfair Display', serif;
-    font-size: 1.8rem;
-    color: var(--primary-navy);
-    margin-bottom: 10px;
-}
-
-.booking-summary {
-    background: rgba(212, 175, 55, 0.1);
-    border: 1px solid rgba(212, 175, 55, 0.3);
-    border-radius: 15px;
-    padding: 20px;
-    margin-bottom: 30px;
-    position: relative;
-    z-index: 2;
-}
-
-.booking-summary h3 {
-    color: var(--primary-navy);
-    margin-bottom: 15px;
-    font-family: 'Playfair Display', serif;
-}
-
-.summary-row {
-    display: flex;
-    justify-content: space-between;
-    margin-bottom: 10px;
-    color: var(--text-dark);
-}
-
-.summary-row.total {
-    border-top: 1px solid rgba(212, 175, 55, 0.3);
-    padding-top: 15px;
-    margin-top: 15px;
-    font-weight: 600;
-    font-size: 1.1rem;
-    color: var(--primary-navy);
-}
-
-.form-group {
-    margin-bottom: 25px;
-    position: relative;
-    z-index: 2;
-}
-
-.form-group label {
-    display: block;
-    margin-bottom: 8px;
-    color: var(--text-dark);
-    font-weight: 500;
-    font-size: 0.95rem;
-}
-
-.form-input, .form-select, .form-textarea {
-    width: 100%;
-    padding: 15px 20px;
-    border: 2px solid var(--glass-border);
-    border-radius: 15px;
-    background: rgba(255, 255, 255, 0.8);
-    backdrop-filter: blur(10px);
-    font-size: 1rem;
-    transition: all 0.3s ease;
-    font-family: 'Inter', sans-serif;
-}
-
-.form-input:focus, .form-select:focus, .form-textarea:focus {
-    outline: none;
-    border-color: var(--primary-gold);
-    box-shadow: var(--glow-gold);
-    transform: translateY(-2px);
-    background: rgba(255, 255, 255, 0.95);
-}
-
-.form-textarea {
-    resize: vertical;
-    min-height: 100px;
-}
-
-.form-row {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 20px;
-}
-
-.extras-section {
-    margin: 30px 0;
-    padding: 25px;
-    background: rgba(255, 255, 255, 0.5);
-    border-radius: 15px;
-    border: 1px solid var(--glass-border);
-}
-
-.extras-section h3 {
-    font-family: 'Playfair Display', serif;
+    font-size: 1.3rem;
     color: var(--primary-navy);
     margin-bottom: 20px;
-    font-size: 1.2rem;
+    text-align: center;
+    position: relative;
+    z-index: 2;
 }
 
-.extra-item {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 15px 0;
-    border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+.summary-content {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 20px;
+    position: relative;
+    z-index: 2;
 }
 
-.extra-item:last-child {
-    border-bottom: none;
+.summary-item {
+    text-align: center;
+    padding: 15px;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 12px;
 }
 
-.extra-info {
-    flex: 1;
-}
-
-.extra-info h4 {
-    color: var(--text-dark);
-    margin-bottom: 5px;
-    font-size: 1rem;
-}
-
-.extra-info p {
-    color: var(--text-light);
+.summary-label {
     font-size: 0.9rem;
+    color: var(--text-light);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    font-weight: 500;
 }
 
-.extra-price {
+.summary-value {
+    font-size: 1.1rem;
+    color: var(--primary-navy);
     font-weight: 600;
-    color: var(--primary-gold);
-    margin-right: 15px;
 }
 
-.extra-checkbox {
-    width: 20px;
-    height: 20px;
-    accent-color: var(--primary-gold);
-    cursor: pointer;
+/* Continue Button */
+.continue-section {
+    text-align: center;
 }
 
-.submit-btn {
-    width: 100%;
+.continue-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
     padding: 18px 40px;
     background: linear-gradient(135deg, var(--primary-gold), var(--accent-copper));
     color: white;
     border: none;
-    border-radius: 15px;
+    border-radius: 50px;
     font-size: 1.1rem;
     font-weight: 600;
     cursor: pointer;
@@ -495,9 +478,10 @@ body::before {
     position: relative;
     overflow: hidden;
     box-shadow: var(--glow-gold);
+    text-decoration: none;
 }
 
-.submit-btn::before {
+.continue-btn::before {
     content: '';
     position: absolute;
     top: 0;
@@ -508,158 +492,34 @@ body::before {
     transition: left 0.5s;
 }
 
-.submit-btn:hover::before {
+.continue-btn:hover::before {
     left: 100%;
 }
 
-.submit-btn:hover {
+.continue-btn:hover {
     transform: translateY(-3px);
     box-shadow: 0 0 30px rgba(212, 175, 55, 0.5);
 }
 
-.submit-btn:disabled {
+.continue-btn:disabled {
     opacity: 0.6;
     cursor: not-allowed;
     transform: none;
 }
 
-/* Success Message */
-.success-message {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: var(--glass-bg);
-    backdrop-filter: blur(20px);
-    border: 1px solid var(--glass-border);
-    border-radius: 25px;
-    padding: 40px;
-    text-align: center;
-    z-index: 1000;
-    opacity: 0;
-    visibility: hidden;
-    transition: all 0.3s ease;
-    box-shadow: var(--luxury-shadow);
-    max-width: 400px;
-    width: 90%;
-}
-
-.success-message.show {
-    opacity: 1;
-    visibility: visible;
-}
-
-.success-icon {
-    font-size: 3rem;
-    color: var(--success-green);
-    margin-bottom: 20px;
-}
-
-.success-message h3 {
-    font-family: 'Playfair Display', serif;
-    color: var(--primary-navy);
-    margin-bottom: 15px;
-}
-
-/* Progress Bar */
-.progress-container {
-    max-width: 1400px;
-    margin: 40px auto;
-    padding: 0 40px;
-}
-
-.progress-bar {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-    position: relative;
-}
-
-.progress-bar::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 3px;
-    background: rgba(212, 175, 55, 0.2);
-    transform: translateY(-50%);
-    z-index: 1;
-}
-
-.progress-bar::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: 66.66%;
-    height: 3px;
-    background: linear-gradient(90deg, var(--primary-gold), var(--accent-copper));
-    transform: translateY(-50%);
-    z-index: 2;
-    transition: width 0.8s ease;
-}
-
-.progress-step {
-    background: white;
-    border: 3px solid rgba(212, 175, 55, 0.2);
-    border-radius: 50%;
-    width: 50px;
-    height: 50px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-weight: 600;
-    position: relative;
-    z-index: 3;
-    transition: all 0.3s ease;
-}
-
-.progress-step.completed {
-    background: var(--primary-gold);
-    border-color: var(--primary-gold);
-    color: white;
-}
-
-.progress-step.active {
-    background: var(--primary-navy);
-    border-color: var(--primary-navy);
-    color: white;
-    box-shadow: var(--glow-gold);
-}
-
-.progress-labels {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
-}
-
-.progress-label {
-    text-align: center;
-    font-size: 0.9rem;
-    color: var(--text-light);
-    font-weight: 500;
-}
-
-.progress-label.active {
-    color: var(--primary-navy);
-    font-weight: 600;
-}
-
 /* Mobile Responsiveness */
 @media (max-width: 768px) {
-    .header-container {
+    .header-container,
+    .progress-container {
         padding: 0 20px;
     }
 
     .main-container {
-        grid-template-columns: 1fr;
         padding: 40px 20px;
-        gap: 40px;
+        max-width: 100%;
     }
 
-    .calendar-section, .reservation-form {
+    .calendar-section {
         padding: 25px;
     }
 
@@ -675,7 +535,7 @@ body::before {
         font-size: 0.6rem;
     }
 
-    .form-row {
+    .summary-content {
         grid-template-columns: 1fr;
         gap: 15px;
     }
@@ -690,10 +550,6 @@ body::before {
 
     .page-title h1 {
         font-size: 2rem;
-    }
-
-    .booking-summary {
-        padding: 15px;
     }
 }
 
@@ -714,5 +570,11 @@ body::before {
     .calendar-day-header {
         padding: 10px 2px;
         font-size: 0.8rem;
+    }
+
+    .progress-step {
+        width: 40px;
+        height: 40px;
+        font-size: 0.9rem;
     }
 }

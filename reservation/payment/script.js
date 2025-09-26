@@ -1,228 +1,332 @@
-// Payment method selection
-document.querySelectorAll('.payment-option').forEach(option => {
-    option.addEventListener('click', function () {
-        // Remove selected class from all options
-        document.querySelectorAll('.payment-option').forEach(opt => opt.classList.remove('selected'));
+// Complete Payment System Script for Ubytování u Moravců
+class PaymentProcessor {
+    constructor() {
+        this.reservationData = this.loadReservationData();
+        this.reservationNumber = this.generateReservationNumber();
 
-        // Add selected class to clicked option
-        this.classList.add('selected');
+        // Bank details completely commented out
+        /*
+        this.bankDetails = {
+            accountNumber: '2901234567/2010',
+            iban: 'CZ87 2010 0000 0029 0123 4567',
+            bic: 'FIOBCZPP',
+            bankName: 'Fio banka, a.s.',
+            recipient: 'Ubytování u Moravců s.r.o.'
+        };
+        */
 
-        // Check the radio button
-        this.querySelector('input[type="radio"]').checked = true;
-
-        // Show/hide payment forms
-        const method = this.dataset.method;
-        showPaymentForm(method);
-    });
-});
-
-function showPaymentForm(method) {
-    // Hide all forms
-    document.getElementById('cardForm').style.display = 'none';
-    document.getElementById('bankInfo').style.display = 'none';
-    document.getElementById('paypalInfo').style.display = 'none';
-    document.getElementById('cryptoInfo').style.display = 'none';
-
-    // Show selected form
-    switch (method) {
-        case 'card':
-            document.getElementById('cardForm').style.display = 'block';
-            document.getElementById('cardForm').classList.add('show');
-            break;
-        case 'bank':
-            document.getElementById('bankInfo').style.display = 'block';
-            break;
-        case 'paypal':
-            document.getElementById('paypalInfo').style.display = 'block';
-            break;
-        case 'crypto':
-            document.getElementById('cryptoInfo').style.display = 'block';
-            break;
-    }
-}
-
-// Card number formatting
-document.getElementById('cardNumber').addEventListener('input', function (e) {
-    let value = e.target.value.replace(/\s/g, '').replace(/[^0-9]/gi, '');
-    let formattedValue = value.match(/.{1,4}/g)?.join(' ') || value;
-    if (formattedValue.length <= 19) {
-        e.target.value = formattedValue;
-    }
-});
-
-// Card expiry formatting
-document.getElementById('cardExpiry').addEventListener('input', function (e) {
-    let value = e.target.value.replace(/\D/g, '');
-    if (value.length >= 2) {
-        value = value.substring(0, 2) + '/' + value.substring(2, 4);
-    }
-    e.target.value = value;
-});
-
-// CVV formatting
-document.getElementById('cardCvv').addEventListener('input', function (e) {
-    e.target.value = e.target.value.replace(/[^0-9]/g, '');
-});
-
-// Form validation
-function validateForm() {
-    const selectedMethod = document.querySelector('input[name="payment"]:checked').value;
-    const termsAccepted = document.getElementById('termsAccept').checked;
-
-    if (!termsAccepted) {
-        alert('Prosím odsouhlaste obchodní podmínky.');
-        return false;
+        this.init();
     }
 
-    if (selectedMethod === 'card') {
-        const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
-        const cardName = document.getElementById('cardName').value;
-        const cardExpiry = document.getElementById('cardExpiry').value;
-        const cardCvv = document.getElementById('cardCvv').value;
-
-        if (!cardNumber || cardNumber.length < 15) {
-            alert('Prosím zadejte platné číslo karty.');
-            return false;
+    init() {
+        if (!this.reservationData || !this.reservationData.checkIn) {
+            this.redirectToStart();
+            return;
         }
-        if (!cardName.trim()) {
-            alert('Prosím zadejte jméno na kartě.');
-            return false;
+
+        this.populateReservationSummary();
+        // Commented out bank transfer UI
+        // this.setupBankTransfer();
+        this.addEventListeners();
+        this.initializeForm();
+    }
+
+    loadReservationData() {
+        const data = localStorage.getItem('fullReservationData');
+        return data ? JSON.parse(data) : null;
+    }
+
+    generateReservationNumber() {
+        const year = new Date().getFullYear();
+        const month = String(new Date().getMonth() + 1).padStart(2, '0');
+        const day = String(new Date().getDate()).padStart(2, '0');
+        const randomNum = Math.floor(Math.random() * 9000) + 1000;
+        return `REZ${year}${month}${day}${randomNum}`;
+    }
+
+    getTotalAmount() {
+        const data = this.reservationData;
+        const subtotal = data.basePrice + data.extrasPrice;
+        const vat = Math.round(subtotal * 0.21);
+        return subtotal + vat;
+    }
+
+    redirectToStart() {
+        alert('Nebyly nalezeny údaje o rezervaci. Přesměrováváme na začátek rezervace.');
+        window.location.href = '../../appointment.html';
+    }
+
+    populateReservationSummary() {
+        const data = this.reservationData;
+
+        // Basic information
+        document.getElementById('reservationNumber').innerHTML = `<i class="fas fa-hashtag"></i> ${this.reservationNumber}`;
+        document.getElementById('guestName').textContent = `${data.firstName} ${data.lastName}`;
+        document.getElementById('guestEmail').textContent = data.email;
+        document.getElementById('guestPhone').textContent = data.phone;
+        document.getElementById('guestCount').textContent = `${data.guests} ${data.guests == 1 ? 'host' : 'hosté'}`;
+
+        // Purpose if provided
+        if (data.purpose) {
+            const purposeMap = {
+                'vacation': 'Dovolená',
+                'business': 'Služební cesta',
+                'romantic': 'Romantický pobyt',
+                'family': 'Rodinná návštěva',
+                'other': 'Jiné'
+            };
+            document.getElementById('guestPurpose').textContent = purposeMap[data.purpose] || data.purpose;
+            document.getElementById('purposeRow').style.display = 'flex';
         }
-        if (!cardExpiry || cardExpiry.length !== 5) {
-            alert('Prosím zadejte platnost karty ve formátu MM/RR.');
-            return false;
+
+        // Dates
+        const checkIn = new Date(data.checkIn);
+        const checkOut = new Date(data.checkOut);
+
+        document.getElementById('checkInDisplay').textContent = this.formatDate(checkIn);
+        document.getElementById('checkOutDisplay').textContent = this.formatDate(checkOut);
+        document.getElementById('nightsDisplay').textContent = `${data.nights} ${this.getNightsText(data.nights)}`;
+
+        // Extras
+        if (data.extras && data.extras.length > 0) {
+            this.populateExtras(data);
         }
-        if (!cardCvv || cardCvv.length < 3) {
-            alert('Prosím zadejte CVV kód.');
-            return false;
+
+        // Pricing
+        this.populatePricing(data);
+
+        // Special notes
+        if (data.notes && data.notes.trim()) {
+            document.getElementById('specialNotes').textContent = data.notes;
+            document.getElementById('notesSection').style.display = 'block';
         }
     }
 
-    return true;
-}
-
-// Payment processing
-document.getElementById('paymentBtn').addEventListener('click', function () {
-    if (!validateForm()) {
-        return;
+    formatDate(date) {
+        return date.toLocaleDateString('cs-CZ', {
+            day: 'numeric',
+            month: 'short',
+            year: 'numeric'
+        });
     }
 
-    const btn = this;
-    const originalText = btn.innerHTML;
+    getNightsText(nights) {
+        if (nights === 1) return 'noc';
+        if (nights <= 4) return 'noci';
+        return 'nocí';
+    }
 
-    // Disable button and show loading
-    btn.disabled = true;
-    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Zpracovává se...';
+    populateExtras(data) {
+        const extrasContainer = document.getElementById('extrasContainer');
+        const extrasList = document.getElementById('extrasList');
 
-    // Simulate payment processing
-    setTimeout(() => {
-        // Show success modal
+        const extrasMap = {
+            'airport': 'Transfer z letiště',
+            'spa': 'Lázeňské balíčky',
+            'dinner': 'Romantická večeře',
+            'concierge': `Osobní concierge (${data.nights} ${data.nights <= 4 ? 'dny' : 'dnů'})`
+        };
+
+        extrasContainer.innerHTML = '';
+        data.extras.forEach(extra => {
+            const extraElement = document.createElement('div');
+            extraElement.className = 'extra-item';
+
+            const totalPrice = extra.perDay ? extra.price * data.nights : extra.price;
+
+            extraElement.innerHTML = `
+                <span class="extra-name">${extrasMap[extra.service] || extra.service}</span>
+                <span class="extra-price">${totalPrice.toLocaleString('cs-CZ')} Kč</span>
+            `;
+            extrasContainer.appendChild(extraElement);
+        });
+
+        extrasList.style.display = 'block';
+    }
+
+    populatePricing(data) {
+        document.getElementById('nightsPricing').textContent = `${data.nights} ${this.getNightsText(data.nights)}`;
+        document.getElementById('basePriceDisplay').textContent = `${data.basePrice.toLocaleString('cs-CZ')} Kč`;
+
+        if (data.extrasPrice > 0) {
+            document.getElementById('extrasPriceDisplay').textContent = `${data.extrasPrice.toLocaleString('cs-CZ')} Kč`;
+            document.getElementById('extrasPriceRow').style.display = 'flex';
+        }
+
+        const subtotal = data.basePrice + data.extrasPrice;
+        const vat = Math.round(subtotal * 0.21);
+        const finalPrice = subtotal + vat;
+
+        document.getElementById('vatDisplay').textContent = `${vat.toLocaleString('cs-CZ')} Kč`;
+        document.getElementById('finalPriceDisplay').textContent = `${finalPrice.toLocaleString('cs-CZ')} Kč`;
+    }
+
+    addEventListeners() {
+        // Payment button click
+        document.getElementById('paymentBtn').addEventListener('click', () => {
+            this.processPayment();
+        });
+
+        // Terms checkbox validation
+        document.getElementById('termsAccept').addEventListener('change', () => {
+            this.validateForm();
+        });
+    }
+
+    validateForm() {
+        const termsAccepted = document.getElementById('termsAccept').checked;
+        const paymentBtn = document.getElementById('paymentBtn');
+
+        if (termsAccepted) {
+            paymentBtn.disabled = false;
+            paymentBtn.style.opacity = '1';
+        } else {
+            paymentBtn.disabled = true;
+            paymentBtn.style.opacity = '0.6';
+        }
+
+        return termsAccepted;
+    }
+
+    initializeForm() {
+        // Initialize and validate form
+        this.validateForm();
+        document.getElementById('paymentBtn').innerHTML = 'Potvrdit rezervaci';
+    }
+
+    processPayment() {
+        if (!this.validateForm()) {
+            this.showNotification('Prosím odsouhlaste obchodní podmínky.', 'error');
+            return;
+        }
+
+        // Always create reservation via API directly
+        this.createReservation();
+    }
+
+    async createReservation() {
+        const btn = document.getElementById('paymentBtn');
+        const originalText = btn.innerHTML;
+
+        btn.disabled = true;
+        btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Vytvářím rezervaci...';
+
+        try {
+            const payload = {
+                first_name: this.reservationData.firstName,
+                last_name: this.reservationData.lastName,
+                email: this.reservationData.email,
+                phone: this.reservationData.phone,
+                guest_count: this.reservationData.guests,
+                purpose: this.reservationData.purpose,
+                check_in: this.reservationData.checkIn,
+                check_out: this.reservationData.checkOut,
+                price_per_night: this.reservationData.pricePerNight,
+                extras_price: this.reservationData.extrasPrice,
+                special_requests: this.reservationData.notes,
+                extras: this.reservationData.extras || []
+            };
+
+            console.log("Sending payload:", payload);
+
+            const response = await fetch('https://mymedevelopers.com/ReserveApi/reservation/createReservation.php', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(payload)
+            });
+
+            const result = await response.json();
+            console.log("API Response:", result);
+
+            if (!result.success) {
+                throw new Error(result.message || "Chyba při vytváření rezervace.");
+            }
+
+            // Save completed reservation
+            localStorage.setItem('completedReservation', JSON.stringify(result.data));
+
+            btn.innerHTML = '<i class="fas fa-check"></i> Rezervace vytvořena!';
+
+            setTimeout(() => {
+                this.showSuccessModal();
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                this.clearStoredData();
+            }, 1000);
+
+        } catch (error) {
+            console.error(error);
+            this.showNotification('Rezervaci se nepodařilo vytvořit: ' + error.message, 'error');
+            btn.innerHTML = originalText;
+            btn.disabled = false;
+        }
+    }
+
+    showSuccessModal() {
+        document.getElementById('confirmationCode').textContent = this.reservationNumber;
         document.getElementById('successModal').classList.add('show');
 
-        // Reset button
-        btn.disabled = false;
-        btn.innerHTML = originalText;
-    }, 3000);
+        this.showNotification('Rezervace byla úspěšně vytvořena!', 'success');
+    }
+
+    clearStoredData() {
+        localStorage.removeItem('reservationDates');
+        localStorage.removeItem('fullReservationData');
+    }
+
+    showNotification(message, type = 'info') {
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+
+        const colors = {
+            success: '#10b981',
+            error: '#ef4444',
+            warning: '#f59e0b',
+            info: '#3b82f6'
+        };
+
+        notification.style.cssText = `
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(255, 255, 255, 0.95);
+            padding: 16px 20px;
+            border-radius: 12px;
+            z-index: 3000;
+            transform: translateX(100%);
+            transition: transform 0.3s ease;
+        `;
+
+        notification.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <span>${message}</span>
+            </div>
+        `;
+
+        document.body.appendChild(notification);
+
+        setTimeout(() => {
+            notification.style.transform = 'translateX(0)';
+        }, 100);
+
+        setTimeout(() => {
+            notification.style.transform = 'translateX(100%)';
+            setTimeout(() => notification.remove(), 300);
+        }, 5000);
+    }
+}
+
+// Initialize when page loads
+document.addEventListener('DOMContentLoaded', () => {
+    window.paymentProcessor = new PaymentProcessor();
 });
 
-// Close success modal
 function closeSuccessModal() {
     document.getElementById('successModal').classList.remove('show');
-    // In real app, redirect to home page
-    // window.location.href = '/';
 }
 
-// Real-time card type detection
-document.getElementById('cardNumber').addEventListener('input', function (e) {
-    const value = e.target.value.replace(/\s/g, '');
-    let cardType = '';
-
-    if (value.startsWith('4')) {
-        cardType = 'visa';
-    } else if (value.startsWith('5') || value.startsWith('2')) {
-        cardType = 'mastercard';
-    } else if (value.startsWith('3')) {
-        cardType = 'amex';
-    }
-
-    // Update card logos highlighting
-    document.querySelectorAll('.card-logo').forEach(logo => {
-        logo.style.opacity = '0.5';
-    });
-
-    if (cardType === 'visa') {
-        document.querySelector('.card-logo:nth-child(1)').style.opacity = '1';
-    } else if (cardType === 'mastercard') {
-        document.querySelector('.card-logo:nth-child(2)').style.opacity = '1';
-    } else if (cardType === 'amex') {
-        document.querySelector('.card-logo:nth-child(3)').style.opacity = '1';
-    }
-});
-
-// Enhanced form interactions
-document.querySelectorAll('.form-input').forEach(input => {
-    input.addEventListener('focus', function () {
-        this.style.transform = 'translateY(-2px)';
-        this.style.boxShadow = 'var(--glow-gold)';
-    });
-
-    input.addEventListener('blur', function () {
-        this.style.transform = 'translateY(0)';
-    });
-});
-
-// Auto-tab for CVV
-document.getElementById('cardCvv').addEventListener('input', function (e) {
-    if (e.target.value.length === 3) {
-        // Could auto-focus next field or validate
-        e.target.blur();
-    }
-});
-
-// Progress animation on load
-window.addEventListener('load', function () {
-    setTimeout(() => {
-        document.querySelector('.progress-bar::after').style.width = '100%';
-    }, 500);
-});
-
-// Keyboard shortcuts
-document.addEventListener('keydown', function (e) {
-    if (e.key === 'Enter' && e.ctrlKey) {
-        document.getElementById('paymentBtn').click();
-    }
-    if (e.key === 'Escape') {
-        if (document.getElementById('successModal').classList.contains('show')) {
-            closeSuccessModal();
-        }
-    }
-});
-
-// Smooth scrolling for any anchor links
-document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-    anchor.addEventListener('click', function (e) {
-        e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            target.scrollIntoView({
-                behavior: 'smooth'
-            });
-        }
-    });
-});
-
-// Enhanced security indicators
-function updateSecurityIndicators() {
-    const cardNumber = document.getElementById('cardNumber').value.replace(/\s/g, '');
-    const securityBadge = document.querySelector('.security-badge');
-
-    if (cardNumber.length > 0) {
-        securityBadge.innerHTML = '<i class="fas fa-shield-check"></i> Spojení zabezpečeno 256-bit SSL';
-        securityBadge.style.color = 'var(--success-green)';
-    } else {
-        securityBadge.innerHTML = '<i class="fas fa-shield-alt"></i> Zabezpečená platba SSL šifrováním';
-        securityBadge.style.color = 'var(--success-green)';
-    }
+function goHome() {
+    window.location.href = '/';
 }
-
-document.getElementById('cardNumber').addEventListener('input', updateSecurityIndicators);

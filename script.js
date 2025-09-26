@@ -1,5 +1,4 @@
-
-        // Custom Cursor
+// Custom Cursor
         const cursor = document.getElementById('cursor');
         const cursorFollower = document.getElementById('cursorFollower');
 
@@ -235,3 +234,219 @@ document.querySelectorAll('a[href^="#"]').forEach(anchor => {
         }
     });
 });
+/* ===== ADMIN KALENDÁŘ – izolovaný jen pro sekci #calendar ===== */
+const AdminCalendar = (() => {
+    const monthNames = [
+        "Leden", "Únor", "Březen", "Duben", "Květen", "Červen",
+        "Červenec", "Srpen", "Září", "Říjen", "Listopad", "Prosinec"
+    ];
+    const dayNames = ["Po","Út","St","Čt","Pá","So","Ne"]; // ISO start v pondělí
+
+    let inited = false;
+    let state = {
+        month: new Date().getMonth(),      // 0-11
+        year: new Date().getFullYear()
+    };
+
+    // Bezpečně najdeme elementy pouze uvnitř sekce Kalendář
+    const getEls = () => {
+        const section = document.getElementById('calendar');
+        if (!section) return {};
+        return {
+            section,
+            grid: section.querySelector('#adminCalendarGrid'),
+            label: section.querySelector('#adminMonthYearLabel'),
+            prev: section.querySelector('#adminCalPrev'),
+            next: section.querySelector('#adminCalNext')
+        };
+    };
+
+    const setMonthLabel = (labelEl, month, year) => {
+        if (labelEl) labelEl.textContent = `${monthNames[month]} ${year}`;
+    };
+
+    const addDayHeaders = (gridEl) => {
+        dayNames.forEach(d => {
+            const h = document.createElement('div');
+            h.className = 'cal-head';
+            h.textContent = d;
+            gridEl.appendChild(h);
+        });
+    };
+
+    const render = async () => {
+        const { grid, label } = getEls();
+        if (!grid || !label) return;
+
+        grid.innerHTML = '';
+        setMonthLabel(label, state.month, state.year);
+        addDayHeaders(grid);
+
+        // Výpočet posunu (pondělí = 0)
+        const firstDate = new Date(state.year, state.month, 1);
+        let firstDay = firstDate.getDay(); // 0=Ne ... 6=So
+        firstDay = (firstDay === 0 ? 6 : firstDay - 1);
+        const daysInMonth = new Date(state.year, state.month + 1, 0).getDate();
+
+        // Načtení dat (rezervace/blokace) – obalte try/catch
+        const monthStr = String(state.month + 1).padStart(2, '0');
+        let reservations = [];
+        let blocked = [];
+        try {
+            const [resRes, blkRes] = await Promise.all([
+                fetch(`${API_BASE_URL}/admin/reservations.php?month=${monthStr}&year=${state.year}`).then(r => r.json()).catch(() => ({})),
+                fetch(`${API_BASE_URL}/admin/block-dates.php?month=${monthStr}&year=${state.year}`).then(r => r.json()).catch(() => ({}))
+            ]);
+            if (resRes && resRes.success) reservations = resRes.data || [];
+            if (blkRes && blkRes.success) blocked = blkRes.data || [];
+        } catch (e) {
+            console.error('Chyba načítání kalendáře:', e);
+        }
+
+        // Indexace podle dne
+        const resByDay = {};
+        reservations.forEach(r => {
+            const from = new Date(r.check_in);
+            const to = new Date(r.check_out);
+            const d = new Date(from);
+            while (d <= to) {
+                if (d.getMonth() === state.month && d.getFullYear() === state.year) {
+                    const key = d.getDate();
+                    (resByDay[key] ||= []).push(r);
+                }
+                d.setDate(d.getDate() + 1);
+            }
+        });
+        const blkByDay = {};
+        blocked.forEach(b => {
+            const d = new Date(b.date);
+            if (d.getMonth() === state.month && d.getFullYear() === state.year) {
+                const key = d.getDate();
+                (blkByDay[key] ||= []).push(b);
+            }
+        });
+
+        // Prázdné buňky před 1. dnem
+        for (let i = 0; i < firstDay; i++) {
+            const empty = document.createElement('div');
+            empty.className = 'cal-empty';
+            grid.appendChild(empty);
+        }
+
+        // Dny v měsíci
+        const today = new Date();
+        for (let day = 1; day <= daysInMonth; day++) {
+            const cell = document.createElement('div');
+            cell.className = 'cal-day';
+            cell.dataset.date = `${state.year}-${monthStr}-${String(day).padStart(2, '0')}`;
+
+            const dn = document.createElement('div');
+            dn.className = 'day-number';
+            dn.textContent = day;
+            cell.appendChild(dn);
+
+            // Stav dne
+            if (day === today.getDate() && state.month === today.getMonth() && state.year === today.getFullYear()) {
+                cell.classList.add('today');
+            }
+            if (resByDay[day]?.length) cell.classList.add('reserved');
+            if (!resByDay[day]?.length && blkByDay[day]?.length) cell.classList.add('blocked');
+
+            // Zobrazit malé tagy (na mobilu se schovají)
+            if (resByDay[day]?.length) {
+                const t = document.createElement('div');
+                t.className = 'tag';
+                t.textContent = `${resByDay[day].length}× rezervace`;
+                cell.appendChild(t);
+            } else if (blkByDay[day]?.length) {
+                const t = document.createElement('div');
+                t.className = 'tag';
+                t.textContent = 'Blokováno';
+                cell.appendChild(t);
+            }
+
+            grid.appendChild(cell);
+        }
+    };
+
+    const bindNav = () => {
+        const { prev, next } = getEls();
+        if (prev) {
+            prev.addEventListener('click', () => {
+                state.month--;
+                if (state.month < 0) { state.month = 11; state.year--; }
+                render();
+            });
+        }
+        if (next) {
+            next.addEventListener('click', () => {
+                state.month++;
+                if (state.month > 11) { state.month = 0; state.year++; }
+                render();
+            });
+        }
+    };
+
+    // Inicializace pouze jednou a pouze pokud je sekce dostupná
+    const init = () => {
+        if (inited) return;
+        const { section, grid, label } = getEls();
+        if (!section || !grid || !label) return;
+
+        inited = true;
+        bindNav();
+        render();
+    };
+
+    // Veřejné API
+    return { init, render };
+})();
+
+/* Spusť kalendář pouze při zobrazení sekce Kalendář */
+(function attachCalendarToSectionSwitch() {
+    const navItems = document.querySelectorAll('.nav-item[data-section]');
+    const sections = document.querySelectorAll('.content-section');
+
+    const showSection = (id) => {
+        sections.forEach(s => s.classList.toggle('active', s.id === id));
+        const title = document.getElementById('pageTitle');
+        if (title) title.textContent = navLabelFor(id);
+
+        if (id === 'calendar') {
+            AdminCalendar.init();
+        }
+    };
+
+    const navLabelFor = (id) => {
+        const map = {
+            dashboard: 'Dashboard',
+            reservations: 'Rezervace',
+            guests: 'Hosté',
+            calendar: 'Kalendář',
+            pricing: 'Ceník',
+            reviews: 'Recenze',
+            payments: 'Platby',
+            reports: 'Reporty',
+            invoices: 'Faktury',
+            settings: 'Nastavení',
+            users: 'Uživatelé',
+            logs: 'Logy'
+        };
+        return map[id] || 'Sekce';
+    };
+
+    navItems.forEach(btn => {
+        btn.addEventListener('click', () => {
+            navItems.forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            const sectionId = btn.getAttribute('data-section');
+            showSection(sectionId);
+        });
+    });
+
+    // pokud je Kalendář aktivní už při načtení (např. přes hash/uložený stav)
+    const initiallyActive = document.querySelector('.content-section.active');
+    if (initiallyActive && initiallyActive.id === 'calendar') {
+        AdminCalendar.init();
+    }
+})();

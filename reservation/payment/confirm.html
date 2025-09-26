@@ -9,313 +9,213 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-container">
-            <a href="#" class="logo">Ubytování u Moravců</a>
-            <a href="#" class="back-btn">
-                <i class="fas fa-arrow-left"></i>
-                Zpět na rezervaci
-            </a>
-        </div>
-    </header>
-
-    <!-- Progress Bar -->
-    <div class="progress-container">
-        <div class="progress-bar">
-            <div class="progress-step completed">1</div>
-            <div class="progress-step completed">2</div>
-            <div class="progress-step active">3</div>
-        </div>
-        <div class="progress-labels">
-            <div class="progress-label">Výběr termínu</div>
-            <div class="progress-label">Údaje</div>
-            <div class="progress-label active">Potvrzení & Platba</div>
-        </div>
+<!-- Header -->
+<header class="header">
+    <div class="header-container">
+        <a href="/" class="logo">Ubytování u Moravců</a>
+        <a href="../form/data.html" class="back-btn">
+            <i class="fas fa-arrow-left"></i>
+            Zpět na údaje
+        </a>
     </div>
+</header>
 
-    <!-- Main Container -->
-    <div class="main-container">
-        <!-- Reservation Summary -->
-        <div class="reservation-summary">
-            <div class="summary-header">
-                <h2>Souhrn rezervace</h2>
-                <span class="reservation-number">
-                    <i class="fas fa-hashtag"></i> REZ-2025-00847
+<!-- Progress Bar -->
+<div class="progress-container">
+    <div class="progress-bar">
+        <div class="progress-step completed">1</div>
+        <div class="progress-step completed">2</div>
+        <div class="progress-step active">3</div>
+    </div>
+    <div class="progress-labels">
+        <div class="progress-label">Výběr termínu</div>
+        <div class="progress-label">Údaje</div>
+        <div class="progress-label active">Potvrzení & Platba</div>
+    </div>
+</div>
+
+<!-- Main Container -->
+<div class="main-container">
+    <!-- Reservation Summary -->
+    <div class="reservation-summary">
+        <div class="summary-header">
+            <h2>Souhrn rezervace</h2>
+            <span class="reservation-number" id="reservationNumber">
+                    <i class="fas fa-hashtag"></i> Načítá se...
                 </span>
-            </div>
+        </div>
 
-            <div class="guest-info">
-                <h3>Informace o hostovi</h3>
-                <div class="info-row">
-                    <span class="info-label">Jméno:</span>
-                    <span class="info-value">Jan Novák</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Email:</span>
-                    <span class="info-value">jan.novak@email.cz</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Telefon:</span>
-                    <span class="info-value">+420 777 123 456</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Počet hostů:</span>
-                    <span class="info-value">2 osoby</span>
-                </div>
+        <div class="info-section">
+            <h3>Informace o hostovi</h3>
+            <div class="info-row">
+                <span class="info-label">Jméno:</span>
+                <span class="info-value" id="guestName">Načítá se...</span>
             </div>
-
-            <div class="stay-details">
-                <h3>Detaily pobytu</h3>
-                <div class="date-range">
-                    <div class="date-box">
-                        <div class="date-label">Příjezd</div>
-                        <div class="date-value">15. srpna 2025</div>
-                    </div>
-                    <div class="date-arrow">
-                        <i class="fas fa-arrow-right"></i>
-                    </div>
-                    <div class="date-box">
-                        <div class="date-label">Odjezd</div>
-                        <div class="date-value">18. srpna 2025</div>
-                    </div>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Počet nocí:</span>
-                    <span class="info-value">3 noci</span>
-                </div>
-                <div class="info-row">
-                    <span class="info-label">Typ apartmánu:</span>
-                    <span class="info-value">Luxusní apartmá</span>
-                </div>
+            <div class="info-row">
+                <span class="info-label">Email:</span>
+                <span class="info-value" id="guestEmail">Načítá se...</span>
             </div>
-
-            <div class="extras-list">
-                <h3>Doplňkové služby</h3>
-                <div class="extra-item">
-                    <span class="extra-name">Transfer z letiště</span>
-                    <span class="extra-price">800 Kč</span>
-                </div>
-                <div class="extra-item">
-                    <span class="extra-name">Romantická večeře</span>
-                    <span class="extra-price">2 500 Kč</span>
-                </div>
-                <div class="extra-item">
-                    <span class="extra-name">Osobní concierge (3 dny)</span>
-                    <span class="extra-price">1 800 Kč</span>
-                </div>
+            <div class="info-row">
+                <span class="info-label">Telefon:</span>
+                <span class="info-value" id="guestPhone">Načítá se...</span>
             </div>
-
-            <div class="price-breakdown">
-                <h3>Rozpis ceny</h3>
-                <div class="price-row">
-                    <span>Ubytování (3 noci × 1 500 Kč)</span>
-                    <span>4 500 Kč</span>
-                </div>
-                <div class="price-row">
-                    <span>Transfer z letiště</span>
-                    <span>800 Kč</span>
-                </div>
-                <div class="price-row">
-                    <span>Romantická večeře</span>
-                    <span>2 500 Kč</span>
-                </div>
-                <div class="price-row">
-                    <span>Osobní concierge</span>
-                    <span>1 800 Kč</span>
-                </div>
-                <div class="price-row">
-                    <span>DPH (21%)</span>
-                    <span>2 016 Kč</span>
-                </div>
-                <div class="price-row total">
-                    <span>Celková cena</span>
-                    <span>11 616 Kč</span>
-                </div>
+            <div class="info-row">
+                <span class="info-label">Počet hostů:</span>
+                <span class="info-value" id="guestCount">Načítá se...</span>
+            </div>
+            <div class="info-row" id="purposeRow" style="display: none;">
+                <span class="info-label">Účel pobytu:</span>
+                <span class="info-value" id="guestPurpose">-</span>
             </div>
         </div>
 
-        <!-- Payment Section -->
-        <div class="payment-section">
-            <div class="payment-header">
-                <h2>Platební údaje</h2>
-                <div class="security-badge">
-                    <i class="fas fa-shield-alt"></i>
-                    Zabezpečená platba SSL šifrováním
+        <div class="info-section">
+            <h3>Detaily pobytu</h3>
+            <div class="date-range">
+                <div class="date-box">
+                    <div class="date-label">Příjezd</div>
+                    <div class="date-value" id="checkInDisplay">Načítá se...</div>
+                </div>
+                <div class="date-arrow">
+                    <i class="fas fa-arrow-right"></i>
+                </div>
+                <div class="date-box">
+                    <div class="date-label">Odjezd</div>
+                    <div class="date-value" id="checkOutDisplay">Načítá se...</div>
                 </div>
             </div>
-
-            <div class="payment-methods">
-                <h3>Způsob platby</h3>
-                <div class="payment-options">
-                    <div class="payment-option selected" data-method="card">
-                        <input type="radio" name="payment" value="card" class="payment-radio" checked>
-                        <div class="payment-icon">
-                            <i class="fas fa-credit-card"></i>
-                        </div>
-                        <div class="payment-details">
-                            <div class="payment-name">Platební karta</div>
-                            <div class="payment-description">Visa, Mastercard, American Express</div>
-                        </div>
-                    </div>
-
-                    <div class="payment-option" data-method="bank">
-                        <input type="radio" name="payment" value="bank" class="payment-radio">
-                        <div class="payment-icon">
-                            <i class="fas fa-university"></i>
-                        </div>
-                        <div class="payment-details">
-                            <div class="payment-name">Bankovní převod</div>
-                            <div class="payment-description">Platba na účet do 3 pracovních dnů</div>
-                        </div>
-                    </div>
-
-                    <div class="payment-option" data-method="paypal">
-                        <input type="radio" name="payment" value="paypal" class="payment-radio">
-                        <div class="payment-icon">
-                            <i class="fab fa-paypal"></i>
-                        </div>
-                        <div class="payment-details">
-                            <div class="payment-name">PayPal</div>
-                            <div class="payment-description">Rychlá a bezpečná platba přes PayPal</div>
-                        </div>
-                    </div>
-
-                    <div class="payment-option" data-method="crypto">
-                        <input type="radio" name="payment" value="crypto" class="payment-radio">
-                        <div class="payment-icon">
-                            <i class="fab fa-bitcoin"></i>
-                        </div>
-                        <div class="payment-details">
-                            <div class="payment-name">Kryptoměny</div>
-                            <div class="payment-description">Bitcoin, Ethereum, USDC</div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Card Form -->
-                <div class="card-form show" id="cardForm">
-                    <div class="form-group">
-                        <label for="cardNumber">Číslo karty</label>
-                        <input type="text" id="cardNumber" class="form-input" placeholder="1234 5678 9012 3456" maxlength="19">
-                    </div>
-                    <div class="form-group">
-                        <label for="cardName">Jméno na kartě</label>
-                        <input type="text" id="cardName" class="form-input" placeholder="Jan Novák">
-                    </div>
-                    <div class="form-row">
-                        <div class="form-group">
-                            <label for="cardExpiry">Platnost</label>
-                            <input type="text" id="cardExpiry" class="form-input" placeholder="MM/RR" maxlength="5">
-                        </div>
-                        <div class="form-group">
-                            <label for="cardCvv">CVV</label>
-                            <input type="text" id="cardCvv" class="form-input" placeholder="123" maxlength="4">
-                        </div>
-                    </div>
-                    <div class="card-logos">
-                        <div class="card-logo">VISA</div>
-                        <div class="card-logo">MC</div>
-                        <div class="card-logo">AMEX</div>
-                        <div class="card-logo">DISC</div>
-                    </div>
-                </div>
-
-                <!-- Bank Transfer Info -->
-                <div class="bank-info" id="bankInfo" style="display: none; background: rgba(255, 255, 255, 0.5); border-radius: 15px; padding: 25px; margin-top: 20px;">
-                    <h4 style="color: var(--primary-navy); margin-bottom: 15px; font-family: 'Playfair Display', serif;">Bankovní údaje</h4>
-                    <div style="display: grid; gap: 10px; font-family: Monaco, monospace; font-size: 0.9rem;">
-                        <div><strong>Číslo účtu:</strong> 123456789/0100</div>
-                        <div><strong>IBAN:</strong> CZ65 0100 0000 0001 2345 6789</div>
-                        <div><strong>BIC/SWIFT:</strong> KOMBCZPP</div>
-                        <div><strong>Variabilní symbol:</strong> 2025847</div>
-                        <div><strong>Zpráva pro příjemce:</strong> REZ-2025-00847</div>
-                    </div>
-                </div>
-
-                <!-- PayPal Info -->
-                <div class="paypal-info" id="paypalInfo" style="display: none; background: rgba(255, 255, 255, 0.5); border-radius: 15px; padding: 25px; margin-top: 20px; text-align: center;">
-                    <p style="color: var(--text-light); margin-bottom: 20px;">Po kliknutí na "Dokončit platbu" budete přesměrováni na PayPal.</p>
-                    <div style="background: #0070ba; color: white; padding: 15px; border-radius: 10px; display: inline-block;">
-                        <i class="fab fa-paypal" style="font-size: 1.5rem;"></i>
-                        <span style="margin-left: 10px; font-weight: 600;">PayPal Checkout</span>
-                    </div>
-                </div>
-
-                <!-- Crypto Info -->
-                <div class="crypto-info" id="cryptoInfo" style="display: none; background: rgba(255, 255, 255, 0.5); border-radius: 15px; padding: 25px; margin-top: 20px;">
-                    <h4 style="color: var(--primary-navy); margin-bottom: 15px; font-family: 'Playfair Display', serif;">Kryptoměny</h4>
-                    <div style="display: grid; gap: 15px;">
-                        <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(255, 255, 255, 0.7); border-radius: 10px;">
-                            <i class="fab fa-bitcoin" style="color: #f7931a; font-size: 1.5rem;"></i>
-                            <div>
-                                <div style="font-weight: 600;">Bitcoin (BTC)</div>
-                                <div style="font-size: 0.9rem; color: var(--text-light);">≈ 0.00024 BTC</div>
-                            </div>
-                        </div>
-                        <div style="display: flex; align-items: center; gap: 15px; padding: 15px; background: rgba(255, 255, 255, 0.7); border-radius: 10px;">
-                            <i class="fab fa-ethereum" style="color: #627eea; font-size: 1.5rem;"></i>
-                            <div>
-                                <div style="font-weight: 600;">Ethereum (ETH)</div>
-                                <div style="font-size: 0.9rem; color: var(--text-light);">≈ 0.0045 ETH</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
+            <div class="info-row">
+                <span class="info-label">Počet nocí:</span>
+                <span class="info-value" id="nightsDisplay">0</span>
             </div>
-
-            <div class="terms-section">
-                <div class="terms-checkbox">
-                    <input type="checkbox" id="termsAccept" required>
-                    <label for="termsAccept" class="terms-text">
-                        Souhlasím s <a href="#" class="terms-link">obchodními podmínkami</a> 
-                        a <a href="#" class="terms-link">zásadami ochrany osobních údajů</a>. 
-                        Potvrzujem, že jsem si přečetl/a storno podmínky.
-                    </label>
-                </div>
-                <div class="terms-checkbox">
-                    <input type="checkbox" id="marketingAccept">
-                    <label for="marketingAccept" class="terms-text">
-                        Souhlasím se zasíláním marketingových sdělení a speciálních nabídek.
-                    </label>
-                </div>
+            <div class="info-row">
+                <span class="info-label">Typ apartmánu:</span>
+                <span class="info-value">Luxusní apartmá</span>
             </div>
+        </div>
 
-            <div class="payment-buttons">
-                <a href="#" class="btn-secondary">
-                    <i class="fas fa-arrow-left"></i>
-                    Zpět
-                </a>
-                <button class="btn-primary" id="paymentBtn">
-                    <i class="fas fa-lock"></i>
-                    Dokončit platbu
-                </button>
+        <div class="extras-list" id="extrasList" style="display: none;">
+            <h3>Doplňkové služby</h3>
+            <div id="extrasContainer">
+                <!-- Dynamic extras will be inserted here -->
             </div>
+        </div>
+
+        <div class="price-breakdown">
+            <h3>Rozpis ceny</h3>
+            <div class="price-row">
+                <span>Ubytování (<span id="nightsPricing">0 nocí</span> × 1 500 Kč)</span>
+                <span id="basePriceDisplay">0 Kč</span>
+            </div>
+            <div class="price-row" id="extrasPriceRow" style="display: none;">
+                <span>Doplňkové služby</span>
+                <span id="extrasPriceDisplay">0 Kč</span>
+            </div>
+            <div class="price-row">
+                <span>DPH (21%)</span>
+                <span id="vatDisplay">0 Kč</span>
+            </div>
+            <div class="price-row total">
+                <span>Celková cena</span>
+                <span id="finalPriceDisplay">0 Kč</span>
+            </div>
+        </div>
+
+        <div class="info-section" id="notesSection" style="display: none;">
+            <h3>Speciální požadavky</h3>
+            <p id="specialNotes" style="color: var(--text-light); line-height: 1.6;"></p>
         </div>
     </div>
 
-    <!-- Success Modal -->
-    <div class="success-modal" id="successModal">
-        <div class="success-content">
-            <div class="success-icon">
-                <i class="fas fa-check-circle"></i>
+    <!-- Payment Section -->
+    <div class="payment-section">
+        <div class="payment-header">
+            <h2>Platební údaje</h2>
+            <div class="security-badge">
+                <i class="fas fa-shield-alt"></i>
+                Zabezpečená platba SSL šifrováním
             </div>
-            <h2>Platba úspěšná!</h2>
-            <p>Vaše rezervace byla úspěšně dokončena. Potvrzení jsme odeslali na váš email.</p>
-            <div class="confirmation-code">
-                REZ-2025-00847
+        </div>
+
+        <div class="payment-methods">
+            <h3>Způsob platby</h3>
+            <div class="payment-options">
+                <!--<div class="payment-option" data-method="card">
+                    <input type="radio" name="payment" value="card" class="payment-radio" checked>
+                    <div class="payment-icon">
+                        <i class="fas fa-credit-card"></i>
+                    </div>
+                    <div class="payment-details">
+                        <div class="payment-name">Platební karta</div>
+                        <div class="payment-description">Visa, Mastercard, American Express</div>
+                    </div>
+                </div>-->
+
+                <div class="payment-option selected" data-method="bank">
+                    <input type="radio" name="payment" value="bank" class="payment-radio" checked>
+                    <div class="payment-icon">
+                        <i class="fas fa-university"></i>
+                    </div>
+                    <div class="payment-details">
+                        <div class="payment-name">Bankovní převod</div>
+                        <div class="payment-description">Platba na účet do 3 pracovních dnů</div>
+                    </div>
+                </div>
             </div>
-            <p style="font-size: 0.9rem; margin-top: 20px;">
-                Rezervace bude potvrzena do 24 hodin. 
-                V případě dotazů nás kontaktujte na +420 777 123 456.
-            </p>
-            <button class="btn-primary" onclick="closeSuccessModal()" style="margin-top: 20px; width: 100%;">
-                <i class="fas fa-home"></i>
-                Zpět na hlavní stránku
+        </div>
+
+        <div class="terms-section">
+            <div class="terms-checkbox">
+                <input type="checkbox" id="termsAccept" required>
+                <label for="termsAccept" class="terms-text">
+                    Souhlasím s <a href="#" class="terms-link">obchodními podmínkami</a>
+                    a <a href="#" class="terms-link">zásadami ochrany osobních údajů</a>.
+                    Potvrzujem, že jsem si přečetl/a storno podmínky.
+                </label>
+            </div>
+            <div class="terms-checkbox">
+                <input type="checkbox" id="marketingAccept">
+                <label for="marketingAccept" class="terms-text">
+                    Souhlasím se zasíláním marketingových sdělení a speciálních nabídek.
+                </label>
+            </div>
+        </div>
+
+        <div class="payment-buttons">
+            <a href="../form/data.html" class="btn-secondary">
+                <i class="fas fa-arrow-left"></i>
+                Zpět
+            </a>
+            <button class="btn-primary" id="paymentBtn">
+                <i class="fas fa-lock"></i>
+                Dokončit platbu
             </button>
         </div>
     </div>
+</div>
 
-    <script src="script.js"></script>
+<!-- Success Modal -->
+<div class="success-modal" id="successModal">
+    <div class="success-content">
+        <div class="success-icon">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <h2>Platba úspěšná!</h2>
+        <p>Vaše rezervace byla úspěšně dokončena. Potvrzení jsme odeslali na váš email.</p>
+        <div class="confirmation-code" id="confirmationCode">
+            REZ-2025-00000
+        </div>
+        <p style="font-size: 0.9rem; margin-top: 20px;">
+            Rezervace bude potvrzena do 24 hodin.
+            V případě dotazů nás kontaktujte na +420 777 123 456.
+        </p>
+        <button class="btn-primary" onclick="goHome()" style="margin-top: 20px; width: 100%;">
+            <i class="fas fa-home"></i>
+            Zpět na hlavní stránku
+        </button>
+    </div>
+</div>
+
+<script src="script.js"></script>
 </body>
 </html>
